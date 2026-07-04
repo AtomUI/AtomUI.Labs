@@ -1,0 +1,65 @@
+name: AtomUI Labs Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      TargetBranch:
+        description: Target branch to build
+        type: string
+        default: main
+      BuildConfiguration:
+        description: Build configuration
+        type: choice
+        options:
+          - Debug
+          - Release
+        default: Release
+      PublishToPrivateFeed:
+        description: Publish to private NuGet feed
+        type: boolean
+        default: false
+
+env:
+  BASE_OUTPUT_DIR: ${{ github.workspace }}/output
+
+jobs:
+  BuildLabsNuget:
+    name: Build AtomUI Labs NuGet packages
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.TargetBranch }}
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore AtomUI.Labs.slnx
+
+      - name: Build
+        run: dotnet build AtomUI.Labs.slnx --configuration ${{ inputs.BuildConfiguration }} --no-restore
+
+      - name: Pack
+        shell: pwsh
+        run: ./scripts/PackToLocal.ps1 -BuildType ${{ inputs.BuildConfiguration }}
+
+      - name: Upload NuGet artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: NuGetPackages
+          path: ${{ env.BASE_OUTPUT_DIR }}/Nuget/${{ inputs.BuildConfiguration }}/*.nupkg
+          if-no-files-found: ignore
+
+      - name: Publish to private NuGet feed
+        if: ${{ inputs.PublishToPrivateFeed == true }}
+        shell: pwsh
+        run: |
+          $packages = Get-ChildItem -Path "${{ env.BASE_OUTPUT_DIR }}/Nuget/${{ inputs.BuildConfiguration }}" -Filter *.nupkg -File
+          foreach ($pkg in $packages) {
+            dotnet nuget push $pkg.FullName --api-key "${{ secrets.PRIVATE_NUGET_API_KEY }}" --source "${{ secrets.PRIVATE_NUGET_SOURCE }}" --skip-duplicate
+          }
+

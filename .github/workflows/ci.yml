@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+
+jobs:
+  build:
+    name: Build and Pack
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore AtomUI.Labs.slnx
+
+      - name: Build Debug
+        run: dotnet build AtomUI.Labs.slnx --configuration Debug --no-restore
+
+      - name: Pack Release
+        shell: pwsh
+        run: ./scripts/PackToLocal.ps1 -BuildType Release
+
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: NuGetPackages
+          path: output/Nuget/Release/*.nupkg
+          if-no-files-found: ignore
+
