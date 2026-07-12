@@ -7,8 +7,6 @@
         <PackageVersion Include="AtomUI.Desktop.Controls" Version="$(AtomUIVersion)"/>
         <PackageVersion Include="AtomUI.Toolkits.GalleryBase" Version="$(AtomUIVersion)"/>
         <PackageVersion Include="AtomUI.Generator" Version="$(AtomUIVersion)"/>
-        <PackageVersion Include="AtomUI.Base" Version="$(AtomUIBaseVersion)"/>
-        <PackageVersion Include="AtomUI.Base.Generator" Version="$(AtomUIBaseVersion)"/>
 
         <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)"/>
         <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
@@ -24,4 +22,3 @@
         <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5"/>
     </ItemGroup>
 </Project>
-

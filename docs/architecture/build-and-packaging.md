@@ -32,7 +32,7 @@ Labs 包版本必须跟随 AtomUI 主版本：
 - 默认标题：`AtomUI Labs Controls`
 - 默认描述：`Experimental controls for AtomUI desktop applications.`
 
-推荐包名前缀为 `AtomUI.Desktop.Controls.Labs.<ControlName>`。实验控件转正后，应迁移到稳定包名并在 Labs 包中记录废弃策略。
+推荐包名前缀为 `AtomUI.Labs.Controls.<ControlName>`。实验控件转正后，应迁移到稳定包名并在 Labs 包中记录废弃策略。
 
 ## 输出路径
 
@@ -71,4 +71,3 @@ git diff --check
 ```
 
 新增真实实验包后，还必须运行对应测试项目和 Release pack。
-

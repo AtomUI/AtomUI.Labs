@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:antdicons="https://atomui.net/icons/antdesign"
+             xmlns:showCases="using:AtomUILabsGallery.ShowCases"
+             x:Class="AtomUILabsGallery.ShowCases.OverviewShowCase"
+             x:DataType="showCases:OverviewViewModel">
+    <atom:ScrollViewer HorizontalScrollBarVisibility="Auto"
+                       VerticalScrollBarVisibility="Auto"
+                       AllowAutoHide="False">
+        <StackPanel MinWidth="640"
+                    MaxWidth="768"
+                    Margin="32"
+                    Spacing="24"
+                    HorizontalAlignment="Center">
+            <Image Source="avares://AtomUILabsGallery/Assets/atomui-labs.png"
+                   Stretch="Uniform"
+                   HorizontalAlignment="Center"
+                   MaxWidth="720" />
+
+            <Border Background="{atom:SharedTokenResource ColorBgContainer}"
+                    BoxShadow="{atom:SharedTokenResource BoxShadowsTertiary}"
+                    CornerRadius="6"
+                    Padding="20">
+                <StackPanel Spacing="16">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="10"
+                                VerticalAlignment="Center">
+                        <atom:TextBlock Text="AtomUI Labs Gallery"
+                                        FontSize="22"
+                                        FontWeight="Bold"
+                                        VerticalAlignment="Center" />
+                        <atom:Tag Text=".NET 10"
+                                  TagColor="blue"
+                                  VerticalAlignment="Center" />
+                        <atom:Tag Text="AtomUI 6.0.8"
+                                  TagColor="green"
+                                  VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <atom:TextBlock Text="A shared desktop gallery for experimental AtomUI controls. Each Labs control can add its own route, navigation item, and showcase page without becoming part of a single aggregate package."
+                                    TextWrapping="Wrap"
+                                    Foreground="{atom:SharedTokenResource ColorTextSecondary}" />
+
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="14">
+                        <Border Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="6"
+                                Padding="18"
+                                MinHeight="116">
+                            <Grid ColumnDefinitions="44,*"
+                                  ColumnSpacing="14"
+                                  VerticalAlignment="Top">
+                                <Border Width="44"
+                                        Height="44"
+                                        CornerRadius="6"
+                                        Background="{atom:SharedTokenResource ColorPrimaryBg}">
+                                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=ExperimentOutlined}"
+                                                        IconBrush="{atom:SharedTokenResource ColorPrimary}"
+                                                        Width="24"
+                                                        Height="24"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1"
+                                            Spacing="8"
+                                            VerticalAlignment="Center">
+                                    <atom:TextBlock Text="Incubate controls"
+                                                    FontSize="16"
+                                                    FontWeight="Bold" />
+                                    <atom:TextBlock Text="Validate APIs, interaction states, theme behavior, and AOT-friendly implementation choices."
+                                                    TextWrapping="Wrap"
+                                                    Foreground="{atom:SharedTokenResource ColorTextSecondary}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                Background="{atom:SharedTokenResource ColorFillTertiary}"
+                                CornerRadius="6"
+                                Padding="18"
+                                MinHeight="116">
+                            <Grid ColumnDefinitions="44,*"
+                                  ColumnSpacing="14"
+                                  VerticalAlignment="Top">
+                                <Border Width="44"
+                                        Height="44"
+                                        CornerRadius="6"
+                                        Background="{atom:SharedTokenResource ColorSuccessBg}">
+                                    <atom:IconPresenter Icon="{antdicons:AntDesignIconProvider Kind=PartitionOutlined}"
+                                                        IconBrush="{atom:SharedTokenResource ColorSuccess}"
+                                                        Width="24"
+                                                        Height="24"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1"
+                                            Spacing="8"
+                                            VerticalAlignment="Center">
+                                    <atom:TextBlock Text="Keep packages separate"
+                                                    FontSize="16"
+                                                    FontWeight="Bold" />
+                                    <atom:TextBlock Text="Labs controls remain independent NuGet packages. The gallery stays a showcase host and development surface."
+                                                    TextWrapping="Wrap"
+                                                    Foreground="{atom:SharedTokenResource ColorTextSecondary}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </atom:ScrollViewer>
+</UserControl>

@@ -65,13 +65,13 @@ Debug builds target `net10.0`. Release builds target `net10.0;net8.0`. All NuGet
 New experimental control projects should use:
 
 ```text
-AtomUI.Desktop.Controls.Labs.<ControlName>
+AtomUI.Labs.Controls.<ControlName>
 ```
 
 Corresponding test projects should use:
 
 ```text
-AtomUI.Desktop.Controls.Labs.<ControlName>.Tests
+AtomUI.Labs.Controls.<ControlName>.Tests
 ```
 
 ## Validation
@@ -84,4 +84,3 @@ dotnet build AtomUI.Labs.slnx --configuration Debug
 pwsh -NoProfile -File ./scripts/PackToLocal.ps1 -BuildType Debug
 git diff --check
 ```
-

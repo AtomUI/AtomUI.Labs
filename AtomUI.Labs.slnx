@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="controlgallery/AtomUILabsGallery/AtomUILabsGallery.csproj" />
+  <Project Path="controlgallery/AtomUILabsGallery.Desktop/AtomUILabsGallery.Desktop.csproj" />
 </Solution>
-

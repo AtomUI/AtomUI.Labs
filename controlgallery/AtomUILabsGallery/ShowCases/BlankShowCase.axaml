@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:gallery="https://atomui.net/oss-controls/gallery"
+             xmlns:showCases="using:AtomUILabsGallery.ShowCases"
+             x:Class="AtomUILabsGallery.ShowCases.BlankShowCase"
+             x:DataType="showCases:BlankViewModel">
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
+        <gallery:GalleryStickyTabsHost StickyContentPadding="28,0,28,0">
+            <gallery:GalleryStickyTabsHost.Header>
+                <gallery:GalleryShowCaseHeader
+                    Title="Blank Showcase"
+                    Category="Labs Controls"
+                    Description="A blank AtomUI Labs showcase template for future experimental controls."
+                    Namespace="AtomUI.Labs.Controls"
+                    Package="AtomUI.Labs.Controls.&lt;ControlName&gt;"
+                    BaseClass="TemplatedControl"
+                    MetadataValueWidth="260" />
+            </gallery:GalleryStickyTabsHost.Header>
+
+            <gallery:ShowCasePanel Name="ExamplesContent"
+                                   ContentMargin="28,10,28,28"
+                                   IsScrollEnabled="False"
+                                   MaxColumns="1">
+                <gallery:ShowCaseItem Title="Blank Example"
+                                      Description="Add the first control example here."
+                                      IsOccupyEntireRow="True"
+                                      IsFake="True" />
+            </gallery:ShowCasePanel>
+        </gallery:GalleryStickyTabsHost>
+    </Grid>
+</UserControl>

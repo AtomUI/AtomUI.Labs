@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="../../build/Output.App.props"/>
+
+    <PropertyGroup>
+        <TargetFramework>$(AtomUIDevelopTargetFramework)</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>AtomUILabsGallery.Desktop</RootNamespace>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <IsAotCompatible>true</IsAotCompatible>
+        <IsTrimmable>true</IsTrimmable>
+        <PublishTrimmed>true</PublishTrimmed>
+        <PublishAot Condition="'$(GalleryPublishAot)' == ''">true</PublishAot>
+        <PublishAot Condition="'$(GalleryPublishAot)' != ''">$(GalleryPublishAot)</PublishAot>
+        <SelfContained>true</SelfContained>
+        <UseAppHost>true</UseAppHost>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="AvaloniaUI.DiagnosticsSupport"/>
+        <PackageReference Include="ReactiveUI.Avalonia"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../AtomUILabsGallery/AtomUILabsGallery.csproj"/>
+    </ItemGroup>
+</Project>

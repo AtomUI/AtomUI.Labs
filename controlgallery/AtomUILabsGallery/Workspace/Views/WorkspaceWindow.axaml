@@ -1,0 +1,22 @@
+<atom:Window xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:vm="using:AtomUILabsGallery.Workspace.ViewModels"
+             x:Class="AtomUILabsGallery.Workspace.Views.WorkspaceWindow"
+             x:DataType="vm:WorkspaceWindowViewModel"
+             Title="{x:Null}"
+             IsPinCaptionButtonVisible="True"
+             IsFullScreenCaptionButtonVisible="True"
+             WindowStartupLocation="CenterScreen"
+             Height="900"
+             Width="1300"
+             MinWidth="1040"
+             MinHeight="720">
+    <Grid>
+        <Grid Name="ShellHost" />
+        <Border Height="1"
+                VerticalAlignment="Top"
+                Background="{atom:SharedTokenResource ColorBorderSecondary}"
+                IsHitTestVisible="False" />
+    </Grid>
+</atom:Window>

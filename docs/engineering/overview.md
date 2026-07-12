@@ -23,13 +23,13 @@ docs/engineering/
 新增控件时，优先使用包名和项目名：
 
 ```text
-AtomUI.Desktop.Controls.Labs.<ControlName>
+AtomUI.Labs.Controls.<ControlName>
 ```
 
 测试项目使用：
 
 ```text
-AtomUI.Desktop.Controls.Labs.<ControlName>.Tests
+AtomUI.Labs.Controls.<ControlName>.Tests
 ```
 
 ## 构建约束
@@ -61,4 +61,3 @@ git diff --check
 ```
 
 涉及 Release、打包、AOT 或发布脚本时，额外运行对应 Release build 和 pack。
-
