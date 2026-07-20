@@ -1,6 +1,6 @@
 # LED Segment 工业级实现原理
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：当前实现契约，更新于 2026-07-20。本文描述现有 `AtomUI.Labs.Led.Segment` 源码；历史性能数据另见性能回归文档。
 
 > 当前实现已将早期同形叠色Glow升级为共享Scoped Blur Glow，并补充`GlowRadius`。正式Glow契约与性能结论见[LED Glow技术路线选型](glow-technical-options.md)和[LED Glow原型评估](glow-prototype-evaluation.md)。
 
@@ -202,6 +202,35 @@ internal readonly record struct SegmentCharacterPattern(
 
 不支持字符第一版建议按空格处理，不抛异常。显示控件不应该因为输入中出现一个不可显示字符导致 UI 崩溃。
 
+## 公共 API
+
+`SegmentDisplay` 当前公开以下 StyledProperty：
+
+| 属性 | 类型 | 代码默认值 | 作用 |
+|---|---|---:|---|
+| `Text` | `string?` | `null` | 待显示的单行文本 |
+| `CharacterHeight` | `double` | `72` | 未缩放字符理想高度，单位 DIP |
+| `CharacterAspectRatio` | `double` | `0.58` | 字符格宽高比 |
+| `CharacterSpacing` | `double` | `8` | 相邻字符格间距 |
+| `SegmentThickness` | `double` | `8` | 段厚度 |
+| `SegmentGap` | `double` | `2` | 段端点间隙 |
+| `SegmentBevelRatio` | `double` | `0.5` | 段端斜切比例 |
+| `DotScale` | `double` | `0.72` | 冒号和小数点相对段厚度的缩放 |
+| `Padding` | `Thickness` | `0` | 内容内边距 |
+| `HorizontalContentAlignment` | `HorizontalAlignment` | `Left` | 多余水平空间中的内容位置 |
+| `VerticalContentAlignment` | `VerticalAlignment` | `Top` | 多余垂直空间中的内容位置 |
+| `OverflowMode` | `SegmentOverflowMode` | `Clip` | 小空间使用裁剪或等比缩小 |
+| `Background` | `IBrush?` | `null` | 控件背景 |
+| `CornerRadius` | `CornerRadius` | `0` | 背景圆角 |
+| `ActiveBrush` | `IBrush?` | `null` | 点亮段画刷 |
+| `InactiveBrush` | `IBrush?` | `null` | 熄灭段画刷 |
+| `GlowBrush` | `IBrush?` | `null` | 可选 Glow 画刷；`null` 完全关闭 |
+| `GlowOpacity` | `double` | `0.35` | Glow 透明度，有效范围 `0..1` |
+| `GlowRadius` | `double` | `6` | scoped blur 半径，有效范围 `0..24` |
+| `ShowInactiveSegments` | `bool` | `true` | 是否绘制熄灭段 |
+
+`SegmentOverflowMode` 当前只包含 `Clip` 和 `ScaleDown`。属性内部规整不回写 StyledProperty，以保持 Binding 和属性优先级。
+
 ## 布局测量
 
 映射决定“哪些段亮”，布局测量决定“每个字符放哪里、多大”。
@@ -209,13 +238,13 @@ internal readonly record struct SegmentCharacterPattern(
 布局输入：
 
 - 规范化后的字符 pattern 列表。
-- 字符期望高度或最终可用尺寸。
+- 字符期望高度。
 - 字符宽高比。
 - 字符间距。
 - 符号宽度规则。
 - Padding。
 
-`CharacterHeight` 表示期望字符高度，用于 `MeasureOverride` 计算理想尺寸。实际 `Render` 阶段会根据最终 `Bounds.Height` 重新计算 layout；如果父容器给了更高或更低的最终高度，最终绘制高度以 arranged bounds 为准。因此 `CharacterHeight` 不是强制绘制高度，而是参与测量的期望值。
+`CharacterHeight` 表示理想字符高度，同时决定未缩放字符格的绘制高度。最终 `Bounds` 不会重写 layout：空间更大时只产生对齐偏移；空间更小时由 `Clip` 裁剪，只有显式 `ScaleDown` 才按比例缩小。
 
 段厚度和段间隙不参与理想尺寸计算。它们只影响字符格内部的几何形状，所以只应触发重绘，不应触发布局测量。
 
@@ -270,7 +299,7 @@ Text 改变
 
 ```text
 Render
-  -> 根据 Bounds.Size 计算实际 layout
+  -> 读取与 MeasureOverride 相同的理想 layout
   -> 根据 OverflowMode 计算绘制缩放
   -> 根据 HorizontalContentAlignment / VerticalContentAlignment 计算偏移
   -> PushClip 到 Bounds
@@ -279,24 +308,7 @@ Render
   -> 根据 pattern 绘制暗段和亮段
 ```
 
-`ArrangeOverride` 不是主要几何生成入口。Segment 是自绘控件，通常没有子控件需要 arrange。`ArrangeOverride` 最多用于记录最终尺寸或标记缓存失效：
-
-最终空间中的ScaleDown比例和内容对齐偏移由LED家族根目录的`LedDisplayLayoutMath`计算。Segment仍自行决定何时启用ScaleDown，并保留最终Bounds参与字符高度布局的路线专属语义。
-
-```csharp
-protected override Size ArrangeOverride(Size finalSize)
-{
-    if (_lastArrangeSize != finalSize)
-    {
-        _lastArrangeSize = finalSize;
-        InvalidateGeometryCache();
-    }
-
-    return finalSize;
-}
-```
-
-不要把几何生成主要塞进 `ArrangeOverride`。几何不仅依赖最终尺寸，也依赖段厚度、间隙、几何风格和字符 slot。Avalonia 可能因为视觉失效重新 `Render`，但不一定重新 `Arrange`。
+Segment 不重写 `ArrangeOverride`。最终空间中的 ScaleDown 比例和内容对齐偏移由家族根目录的 `LedDisplayLayoutMath` 计算；Arrange 尺寸不进入 layout 或 geometry 缓存键。Avalonia 可能因为视觉失效重新 `Render` 而不重新 `Arrange`，因此几何生成只由当前理想 layout 和几何属性驱动。
 
 ## 几何生成
 
@@ -429,14 +441,13 @@ foreach (var slot in layout.Slots)
 
 暗段用于表达未点亮但仍可见的 LED 轮廓。没有暗段时，控件更像普通矢量图形，不像真实设备面板。
 
-第一版不做真实 blur 发光。当前 Glow 是一个可选半透明预绘制层：
+当前 Glow 是可选的 scoped blur 层：
 
 - `GlowBrush = null` 时完全关闭，这是默认状态。
 - `GlowOpacity` 默认 `0.35`，但只有 `GlowBrush` 存在时才生效。
-- Glow 使用同一份 cached `Geometry`，不会因为开启 Glow 生成另一套几何。
-- `GlowBrush` 和 `GlowOpacity` 只影响绘制，不进入 geometry cache key。
-
-这不是最终真实 LED 光晕模型，只是最低风险的视觉层次能力。后续如果做 blur、外扩光晕或材质效果，必须重新审查性能、缓存和边界测试。
+- Glow 使用同一份可见 Active 聚合 `Geometry`，通过单个 `BlurEffect` 作用域绘制，不生成另一套段几何。
+- `GlowBrush`、`GlowOpacity` 和 `GlowRadius` 只影响绘制，不进入 geometry cache key。
+- `GlowBrush = null`、有效透明度为 0 或有效半径为 0 时不创建 Effect。
 
 当前第一版已经落地的绘制语义：
 
@@ -460,6 +471,8 @@ Segment 第一版采用“显示控件不因非法输入崩溃”的策略。所
 - `Infinity` 视为最小值或被 clamp 到范围内。
 - 负数按 0 处理，带最小值的属性按最小值处理。
 - `Padding` 的四个方向分别规整为非负有限数。
+- 布局数值上限为 `1_000_000`；极端有限输入也不能产生无穷 DesiredSize、slot 或几何坐标。
+- `CornerRadius` 四角分别规整为非负有限数并受相同上限约束。
 - `CharacterAspectRatio` 最小值为 `0.1`。
 - 渲染阶段 `SegmentThickness` 最小值为 `1`，随后在 `SegmentGeometryFactory` 中按字符格尺寸继续 clamp。
 - `SegmentGap` 最小值为 `0`，随后在 `SegmentGeometryFactory` 中按字符格尺寸继续 clamp。
@@ -498,7 +511,7 @@ Segment 第一版采用“显示控件不因非法输入崩溃”的策略。所
 
 当前控件缓存分两层：
 
-- layout 缓存：`Text`、`CharacterHeight`、`CharacterAspectRatio`、`CharacterSpacing`、`Padding`、最终 `Bounds.Size`。
+- layout 缓存：`Text`、`CharacterHeight`、`CharacterAspectRatio`、`CharacterSpacing`、`Padding`。
 - geometry 缓存：slot 数量、每个 slot 的字符类型和 bounds，以及 `SegmentThickness`、`SegmentGap`、`SegmentBevelRatio`、`DotScale`。
 
 geometry 缓存不能直接包含 `Text`。数字和字母的字符内容决定哪些段点亮，但不改变同一个字符格中的十四段骨架。例如 `"12" -> "34"` 必须重新映射字符和计算 layout，却可以复用原来的 Geometry。Render 必须使用当前 layout 中的 `SegmentCharacterPattern` 选择亮段，不能把旧 pattern 和 cached Geometry 捆绑保存。
@@ -552,9 +565,9 @@ Shared Token
   -> Render 读取最终属性值
 ```
 
-## 第一版边界
+## 当前能力边界
 
-第一版应该做：
+当前已经实现：
 
 - 静态十四段字符显示。
 - 数字、`A-Z`、冒号、小数点、负号、空格。
@@ -567,15 +580,15 @@ Shared Token
 - 可主题化。
 - 基础段形态配置。
 - 冒号和小数点统一几何缓存。
-- 最小 Glow 绘制层。
+- 共享 `LedGlowRenderer` 的 scoped `BlurEffect` Glow。
 
-第一版不做：
+当前不支持：
 
 - 普通字体模拟 LED。
 - 点阵显示。
 - 滚动字幕。
 - 内置闪烁和复杂动画。
-- 真实 blur 光晕和复杂材质。
+- Glow 材质、偏移、质量等级或自定义后端。
 - 多行文本。
 - 中文和复杂脚本。
 - 富文本。
@@ -600,15 +613,16 @@ Segment 不能只靠手动看 sample。
 
 - `LedCharacterNormalizerTests`：ASCII 小写转大写。
 - `SegmentCharacterMapTests`：数字、`A-Z`、符号、冒号、小数点、未知字符 fallback。
-- `SegmentLayoutEngineTests`：slot 数量、窄符号宽度、padding、spacing、最终高度、非法数值规整。
+- `SegmentLayoutEngineTests`：slot 数量、窄符号宽度、padding、spacing、理想尺寸不受最终空间改写、非法数值规整。
 - `SegmentGeometryFactoryTests`：14 段完整性、bounds 内几何、极端 thickness/gap、非正 bounds、非有限选项。
 - `SegmentDisplayContractTests`：StyledProperty 名称、默认值、CLR wrapper、内容对齐和溢出策略。
 - `SegmentDisplayMeasureTests`：真实控件测量、padding、非法数值、厚度和间隙不影响 DesiredSize。
-- `SegmentDisplayRenderTests`：基础 render 不抛异常、暗段/亮段绘制数量、冒号/小数点绘制语义、`ActiveBrush = null` 语义、Glow 绘制语义、同 topology 文本更新复用几何、topology 或几何参数变化刷新几何、Glow 参数变化不刷新几何、内容对齐或溢出策略变化不刷新几何、`ScaleDown` 产生绘制变换。
+- `SegmentDisplayRenderTests`：基础 render、亮暗层、符号、空画刷、scoped Glow、圆角、极端数值、几何复用与失效、对齐、裁剪和 `ScaleDown`。
+- `SegmentDisplayThemeTests`：AXAML 主题发现、Shared Token 默认值、Dark/Compact 更新和本地值优先级。
 - `SegmentDisplayAutomationTests`：只读 Text 自动化类型、规范化后的自动化名称、显式自动化名称优先级和动态文本同步。
 - 小数逻辑尺寸测试：非整数 bounds、段厚度和间隙下，几何保持有限并位于字符格范围内；DPI 栅格化仍由 Avalonia 负责。
 - 高频更新测试：连续 2000 次固定四位数字更新必须重建 layout、复用 geometry，并在随后发生 topology 或几何参数变化时正确失效。
 
 性能回归场景和验收矩阵见 [segment-performance-regression.md](segment-performance-regression.md)。
 
-真实空间Glow的三条候选路线、统一属性约束和选型标准见 [glow-technical-options.md](glow-technical-options.md)。Segment当前同形叠色Glow属于历史现状，不代表选型已经完成。
+当前 Glow 的统一属性、绘制、资源和性能契约见 [glow-technical-options.md](glow-technical-options.md)；候选路线与原型数据见 [glow-prototype-evaluation.md](glow-prototype-evaluation.md)。
