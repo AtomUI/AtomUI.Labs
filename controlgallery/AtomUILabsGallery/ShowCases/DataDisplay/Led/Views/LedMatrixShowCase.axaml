@@ -1,0 +1,197 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:gallery="https://atomui.net/oss-controls/gallery"
+             xmlns:labs="https://atomui.net/labs"
+             xmlns:led="using:AtomUILabsGallery.ShowCases.Led"
+             x:Class="AtomUILabsGallery.ShowCases.Led.LedMatrixShowCase"
+             x:DataType="led:LedMatrixViewModel">
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
+        <gallery:GalleryStickyTabsHost>
+            <gallery:GalleryStickyTabsHost.Header>
+                <gallery:GalleryShowCaseHeader Title="LED Matrix"
+                                               Category="Data Display"
+                                               Status="Experimental"
+                                               Subtitle="Fixed 5x7 dot-matrix LED-style text display."
+                                               Description="Displays Latin text and symbols with configurable dot shape, panel border, glow, overflow and through-screen marquee."
+                                               Namespace="AtomUI.Labs.Led.Matrix"
+                                               Package="AtomUI.Labs.Led"
+                                               BaseClass="Control" />
+            </gallery:GalleryStickyTabsHost.Header>
+
+            <gallery:ShowCasePanel Name="ExamplesContent"
+                                   ContentMargin="28,10,28,28"
+                                   IsScrollEnabled="False"
+                                   IsDeferredLoadingEnabled="True"
+                                   InitialDeferredLoadItemCount="4"
+                                   DeferredLoadBatchSize="2"
+                                   MaxColumns="1">
+                <gallery:ShowCaseItem Title="Basic glyphs"
+                                      Description="The built-in 5x7 set covers Latin letters, digits and common symbols; unsupported input falls back safely."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <StackPanel Spacing="12">
+                                <labs:MatrixDisplay Text="MATRIX 5X7" />
+                                <labs:MatrixDisplay Text="?-.:_+=/"
+                                                    DotSize="7"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="8"
+                                                    Padding="14"
+                                                    Background="#0A0F14"
+                                                    ActiveBrush="#5FECFF"
+                                                    InactiveBrush="#265FECFF"
+                                                    CornerRadius="8" />
+                                <labs:MatrixDisplay Text="A中Z"
+                                                    DotSize="7"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="9" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Dot shapes"
+                                      Description="Circle, square and rounded-square dots share the same glyph and layout model."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
+                                <labs:MatrixDisplay Text="CIRCLE"
+                                                    DotShape="Circle"
+                                                    DotSize="6"
+                                                    Padding="12" />
+                                <labs:MatrixDisplay Grid.Column="1"
+                                                    Text="SQUARE"
+                                                    DotShape="Square"
+                                                    DotSize="6"
+                                                    Padding="12" />
+                                <labs:MatrixDisplay Grid.Column="2"
+                                                    Text="ROUND"
+                                                    DotShape="RoundedSquare"
+                                                    DotCornerRadiusRatio="0.35"
+                                                    DotSize="6"
+                                                    Padding="12" />
+                            </Grid>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Panel border"
+                                      Description="Uniform and asymmetric borders preserve the content viewport and rounded panel geometry."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <labs:MatrixDisplay Text="BORDER"
+                                                    Height="108"
+                                                    BorderBrush="#4A9DB5"
+                                                    BorderThickness="2"
+                                                    CornerRadius="12"
+                                                    Padding="14"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center" />
+                                <labs:MatrixDisplay Grid.Column="1"
+                                                    Text="ASYMM"
+                                                    Height="108"
+                                                    BorderBrush="#FFBE5C"
+                                                    BorderThickness="2,4,6,8"
+                                                    CornerRadius="12"
+                                                    Padding="14"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Alignment and overflow"
+                                      Description="Long content can clip or scale down explicitly while retaining content alignment."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <StackPanel Spacing="12">
+                                <labs:MatrixDisplay Text="CENTER"
+                                                    Height="120"
+                                                    DotSize="7"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="10"
+                                                    Padding="14"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    Background="#0C1612"
+                                                    ActiveBrush="#67F2A3"
+                                                    InactiveBrush="#2267F2A3"
+                                                    CornerRadius="8" />
+                                <labs:MatrixDisplay Text="1234567890"
+                                                    Width="280"
+                                                    Height="72"
+                                                    DotSize="8"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="10"
+                                                    Padding="12"
+                                                    OverflowMode="ScaleDown"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    Background="#18100C"
+                                                    ActiveBrush="#FF8E5B"
+                                                    InactiveBrush="#22FF8E5B"
+                                                    CornerRadius="8" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Marquee and glow"
+                                      Description="A single-direction through-screen marquee can combine with the scoped blur glow layer."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <StackPanel Spacing="12">
+                                <labs:MatrixDisplay Text="ATOMUI LABS MATRIX MARQUEE 2026"
+                                                    Width="620"
+                                                    Height="92"
+                                                    DotSize="7"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="9"
+                                                    Padding="12"
+                                                    IsMarqueeEnabled="True"
+                                                    MarqueeSpeed="72"
+                                                    MarqueeRepeatDelay="0:0:0.75"
+                                                    Background="#110D16"
+                                                    ActiveBrush="#FFF8FF"
+                                                    InactiveBrush="#20D0A0FF"
+                                                    GlowBrush="#FF30D0"
+                                                    GlowOpacity="0.55"
+                                                    GlowRadius="8"
+                                                    CornerRadius="8" />
+                                <labs:MatrixDisplay Text="GLOW 2026"
+                                                    DotSize="7"
+                                                    DotSpacing="2"
+                                                    CharacterSpacing="9"
+                                                    Padding="20"
+                                                    Background="#060A0E"
+                                                    ActiveBrush="White"
+                                                    InactiveBrush="#1C6E8A94"
+                                                    GlowBrush="#4ADEFF"
+                                                    GlowOpacity="0.35"
+                                                    GlowRadius="12"
+                                                    CornerRadius="8" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Dynamic counters"
+                                      Description="Fixed-length updates reuse glyph geometry while refreshing the current layout."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedMatrixViewModel">
+                            <led:LedDynamicDisplays />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+            </gallery:ShowCasePanel>
+        </gallery:GalleryStickyTabsHost>
+    </Grid>
+</UserControl>
