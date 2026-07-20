@@ -1,8 +1,8 @@
 # LED 控件家族设计
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
-本文记录 `AtomUI.Labs.Controls.LED` 的组件域设计。LED 是 Labs 下的实验控件家族名，不是单一控件名。
+本文记录 `AtomUI.Labs.Led` 的组件域设计。LED 是 Labs 下的实验控件家族名，不是单一控件名。
 
 ## 文档导航
 
@@ -13,12 +13,12 @@
 
 ## 定位
 
-`AtomUI.Labs.Controls.LED` 用于承载 LED 风格显示控件。它不表示硬件 LED 控制器，也不表示普通文本控件。
+`AtomUI.Labs.Led` 用于承载 LED 风格显示控件。它不表示硬件 LED 控制器，也不表示普通文本控件。
 
 LED 家族目标包含两条并列路线：
 
 ```text
-AtomUI.Labs.Controls.LED
+AtomUI.Labs.Led
   Segment  十四段数码管路线
   Matrix   点阵屏路线
 ```
@@ -28,17 +28,18 @@ AtomUI.Labs.Controls.LED
 - `Segment` 以“段”为最小视觉单元，适合数字、英文字母、仪表读数和电子设备面板风格。
 - `Matrix` 以“点阵像素”为最小视觉单元，适合字符屏、公告屏、滚动文字和更自由的符号表达。
 
-共享基础代码直接放在 `LED/` 根目录下，当前包括`LEDCharacterNormalizer`和`LEDDisplayLayoutMath`，不创建`Primitives`、`Shared`或`Internal`等独立目录。
+共享基础代码直接放在 `src/AtomUI.Labs.Led/` 根目录下，当前包括 `LedCharacterNormalizer` 和 `LedDisplayLayoutMath`，不创建 `Primitives`、`Shared` 或 `Internal` 等独立目录。
 
 LED 家族主题必须采用聚合入口：
 
 ```text
-LED/Themes/LEDThemes.axaml
-  -> LED/Segment/Themes/SegmentThemes.axaml
-  -> LED/Matrix/Themes/MatrixThemes.axaml
+LedThemesProvider.axaml
+  -> Themes/LedThemes.axaml
+      -> Segment/Themes/SegmentThemes.axaml
+      -> Matrix/Themes/MatrixThemes.axaml
 ```
 
-包级 `AtomUILabsThemesProvider.axaml` 只引用 `LED/Themes/LEDThemes.axaml`，不直接引用某个子控件的最底层主题文件。
+包级 `LedThemesProvider.axaml` 只引用 `Themes/LedThemes.axaml`，不直接引用某个子控件的最底层主题文件。
 
 ## 显示模型
 
@@ -47,8 +48,8 @@ LED 家族需要先区分三种常见显示模型：
 | 模型 | 核心单元 | 适合内容 | 优点 | 缺点 | Labs 定位 |
 |---|---|---|---|---|---|
 | 七段 | 7 个发光段 | 数字、少量符号 | 简单、经典、计算量低 | 字母表现差，很多字符不可读 | 不作为独立第一路线，可作为 Segment 的简化能力评估 |
-| 十四段 | 14 个发光段 | 数字、A-Z、常用符号 | 保留数码管风格，能覆盖英文字母 | 字符映射没有唯一标准，实现复杂度高于七段 | `LED.Segment` 的主要方向 |
-| 点阵 | 点阵像素 | 文本、符号、滚动屏 | 表达能力强，可读性更可控 | 风格变成像素屏，需要字模系统 | `LED.Matrix` 的主要方向 |
+| 十四段 | 14 个发光段 | 数字、A-Z、常用符号 | 保留数码管风格，能覆盖英文字母 | 字符映射没有唯一标准，实现复杂度高于七段 | `Led.Segment` 的主要方向 |
+| 点阵 | 点阵像素 | 文本、符号、滚动屏 | 表达能力强，可读性更可控 | 风格变成像素屏，需要字模系统 | `Led.Matrix` 的主要方向 |
 
 第一阶段文档约定：
 
@@ -58,7 +59,7 @@ LED 家族需要先区分三种常见显示模型：
 
 ## Segment 路线
 
-`LED.Segment` 是十四段数码管路线。
+`Led.Segment` 是十四段数码管路线。
 
 工程核心：
 
@@ -84,7 +85,7 @@ Text
 
 ## Matrix 路线
 
-`LED.Matrix` 是点阵屏路线。
+`Led.Matrix` 是点阵屏路线。
 
 工程核心：
 
@@ -110,7 +111,7 @@ Matrix静态轮廓的完整合同见[matrix-static-visual-system.md](matrix-stat
 
 ## 共享基础代码
 
-`Segment` 和 `Matrix` 可以共享 LED 家族内部基础代码，但第一版不可为了架构感过度抽象。共享代码不需要提前放入固定目录，可以先直接放在 `LED/` 根目录下；只有当真实重复稳定后，再评估是否增加 `Primitives`、`Shared` 或 `Internal` 等目录。
+`Segment` 和 `Matrix` 可以共享 LED 家族内部基础代码，但第一版不可为了架构感过度抽象。共享代码直接放在包项目根目录；只有当真实重复稳定后，再评估是否增加 `Primitives`、`Shared` 或 `Internal` 等目录。
 
 子控件内部目录应按稳定职责组织。`Segment` 当前采用：
 
@@ -128,8 +129,8 @@ Segment/
 
 当前已经共享的内容：
 
-- `LEDCharacterNormalizer`：ASCII小写转大写。
-- `LEDDisplayLayoutMath`：ScaleDown比例和内容对齐偏移纯计算。
+- `LedCharacterNormalizer`：ASCII小写转大写。
+- `LedDisplayLayoutMath`：ScaleDown比例和内容对齐偏移纯计算。
 
 已经统一行为但不提取代码的内容：
 
@@ -151,7 +152,7 @@ Segment/
 - Matrix dot 绘制逻辑。
 - 两条路线各自的几何生成细节。
 
-原则上，第一版只共享输入、状态、选项和少量数学辅助；不共享字符映射、字模、几何生成和具体绘制。公共抽象必须来自真实重复，不能先设计一个看起来通用但掩盖路线差异的 `LEDLayoutEngine`、`LEDRenderer` 或 `LEDGeometryFactory`。
+原则上，第一版只共享输入、状态、选项和少量数学辅助；不共享字符映射、字模、几何生成和具体绘制。公共抽象必须来自真实重复，不能先设计一个看起来通用但掩盖路线差异的 `LedLayoutEngine`、`LedRenderer` 或 `LedGeometryFactory`。
 
 公共边界的逐项审计结论见[family-common-boundary-audit.md](family-common-boundary-audit.md)。
 

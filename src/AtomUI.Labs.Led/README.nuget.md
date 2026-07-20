@@ -1,0 +1,38 @@
+## AtomUI Labs Led
+
+`AtomUI.Labs.Led` provides experimental LED-style display controls for AtomUI applications:
+
+- `SegmentDisplay`: fourteen-segment text display;
+- `MatrixDisplay`: fixed 5x7 dot-matrix text display with optional marquee and glow.
+
+### Install
+
+```bash
+dotnet add package AtomUI.Labs.Led
+```
+
+Use a package version that matches the AtomUI packages in the application.
+
+### Application setup
+
+```csharp
+this.UseAtomUI(builder => builder.UseLed());
+```
+
+### AXAML
+
+```xml
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:labs="https://atomui.net/labs">
+    <StackPanel Spacing="12">
+        <labs:SegmentDisplay Text="12:45" />
+        <labs:MatrixDisplay Text="ATOMUI LABS" />
+    </StackPanel>
+</Window>
+```
+
+The package depends directly on AtomUI.Core and Avalonia. It does not require AtomUI.Desktop.Controls.
+
+### Status and license
+
+The controls are experimental and their public APIs may evolve. The package follows the AtomUI.Labs repository license.

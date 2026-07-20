@@ -1,12 +1,12 @@
 # LED Segment 工业级实现原理
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
 > 当前实现已将早期同形叠色Glow升级为共享Scoped Blur Glow，并补充`GlowRadius`。正式Glow契约与性能结论见[LED Glow技术路线选型](glow-technical-options.md)和[LED Glow原型评估](glow-prototype-evaluation.md)。
 
 > 当前Render不再逐段提交Geometry命令。可见Inactive段聚合为一个缓存Geometry，可见Active段聚合为另一个缓存Geometry；Active聚合同时用于一次Glow Effect和清晰本体绘制。Text变化只替换当前Active聚合，同槽位同Geometry配置继续复用Inactive聚合，不保留历史文本缓存。
 
-本文记录 `AtomUI.Labs.Controls.LED.Segment` 的目标实现原理。目标读者可以是第一次接触 LED 控件的新手，但实现标准必须按工业级自绘控件来约束。
+本文记录 `AtomUI.Labs.Led.Segment` 的目标实现原理。目标读者可以是第一次接触 LED 控件的新手，但实现标准必须按工业级自绘控件来约束。
 
 `Segment` 是十四段数码管路线。它不是字体控件，不是点阵控件，也不是硬件 LED 控制器。
 
@@ -55,7 +55,7 @@ Segment 的本质是基于字符映射表和参数化几何生成器的 Avalonia
 `Segment` 必须保持和正式控件库一致的工程入口习惯：公共控件类型留在控件根目录，内部实现按稳定职责进入子目录，主题通过 `*Themes.axaml` 聚合。
 
 ```text
-LED/Segment/
+src/AtomUI.Labs.Led/Segment/
   SegmentDisplay.cs
   SegmentOverflowMode.cs
   SegmentValueSanitizer.cs
@@ -82,10 +82,10 @@ LED/Segment/
 主题入口链路：
 
 ```text
-AtomUILabsThemesProvider.axaml
-  -> LED/Themes/LEDThemes.axaml
-      -> LED/Segment/Themes/SegmentThemes.axaml
-          -> LED/Segment/Themes/SegmentDisplayTheme.axaml
+LedThemesProvider.axaml
+  -> Themes/LedThemes.axaml
+      -> Segment/Themes/SegmentThemes.axaml
+          -> Segment/Themes/SegmentDisplayTheme.axaml
 ```
 
 `SegmentToken.cs` 当前不创建。Token 会固定主题契约，必须等视觉语义稳定后单独设计，不能作为目录对齐的附带动作。
@@ -281,7 +281,7 @@ Render
 
 `ArrangeOverride` 不是主要几何生成入口。Segment 是自绘控件，通常没有子控件需要 arrange。`ArrangeOverride` 最多用于记录最终尺寸或标记缓存失效：
 
-最终空间中的ScaleDown比例和内容对齐偏移由LED家族根目录的`LEDDisplayLayoutMath`计算。Segment仍自行决定何时启用ScaleDown，并保留最终Bounds参与字符高度布局的路线专属语义。
+最终空间中的ScaleDown比例和内容对齐偏移由LED家族根目录的`LedDisplayLayoutMath`计算。Segment仍自行决定何时启用ScaleDown，并保留最终Bounds参与字符高度布局的路线专属语义。
 
 ```csharp
 protected override Size ArrangeOverride(Size finalSize)
@@ -598,7 +598,7 @@ Segment 不能只靠手动看 sample。
 
 当前测试覆盖：
 
-- `LEDCharacterNormalizerTests`：ASCII 小写转大写。
+- `LedCharacterNormalizerTests`：ASCII 小写转大写。
 - `SegmentCharacterMapTests`：数字、`A-Z`、符号、冒号、小数点、未知字符 fallback。
 - `SegmentLayoutEngineTests`：slot 数量、窄符号宽度、padding、spacing、最终高度、非法数值规整。
 - `SegmentGeometryFactoryTests`：14 段完整性、bounds 内几何、极端 thickness/gap、非正 bounds、非有限选项。

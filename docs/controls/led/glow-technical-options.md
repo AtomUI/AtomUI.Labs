@@ -1,8 +1,8 @@
 # LED Glow 技术路线选型
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
-本文记录 `AtomUI.Labs.Controls.LED` 家族真实静态 Glow 的技术路线。候选路线、评估过程和迁移前参考实现的最终决议均保留在本文中；当前 Labs 仓库尚未实现对应运行时代码。
+本文记录 `AtomUI.Labs.Led` 家族真实静态 Glow 的技术路线。候选路线、评估过程和迁移前参考实现的最终决议均保留在本文中；对应运行时代码现已迁入本仓库。
 
 Glow是Matrix与Segment之上的可选视觉增强层。两个基础控件在没有Glow时必须保持完整、可生产使用。Glow只接收已经生成的Active Geometry，不读取字符、字模、点阵行列或SegmentParts。
 
@@ -81,7 +81,7 @@ Matrix与Segment不仅要保持Glow语义一致，还必须共享同一套Glow�
 ```text
 MatrixDisplay
   -> Matrix字符级Active Geometry适配 ─┐
-                                      ├─> LEDGlowRenderer / LEDGlowCache
+                                      ├─> LedGlowRenderer / LedGlowCache
 SegmentDisplay                        │
   -> Segment活跃段Geometry集合适配 ───┘
 ```
@@ -96,16 +96,16 @@ SegmentDisplay                        │
 | Glow核心 | Mask、Blur、Brush着色、Opacity合成、Radius和DPI处理 | 使用完全相同实现 | 真实共享 |
 | 派生资源 | 字符级Glow缓存 | 字符级Glow缓存 | 共享缓存实现，实例分别拥有 |
 
-不建立`LEDGlowControl`公共控件基类，不让Matrix通过`SegmentDisplay.GlowBrushProperty.AddOwner`依赖Segment，也不为了Glow合并字符映射、布局、Overflow或基础Geometry缓存。分别注册StyledProperty是为了保持控件所有权边界，不代表允许复制Glow算法。
+不建立 `LedGlowControl` 公共控件基类，不让 Matrix 通过 `SegmentDisplay.GlowBrushProperty.AddOwner` 依赖 Segment，也不为了 Glow 合并字符映射、布局、Overflow 或基础 Geometry 缓存。分别注册 StyledProperty 是为了保持控件所有权边界，不代表允许复制 Glow 算法。
 
 最终内部结构允许类似：
 
 ```text
-LED/
+src/AtomUI.Labs.Led/
   Glow/
-    LEDGlowRenderOptions
-    LEDGlowRenderer
-    LEDGlowCache
+    LedGlowRenderOptions
+    LedGlowRenderer
+    LedGlowCache
     选定路线的Mask/Blur实现
   Matrix/
     Matrix自己的基础显示和Glow输入适配
@@ -365,7 +365,7 @@ Effect粒度：每个控件一次
 Skia自定义：未启动，不进入正式运行时
 ```
 
-最终实现使用`DrawingContext.PushEffect(BlurEffect, bounds)`隔离全部可见Active Geometry。Matrix与Segment分别完成基础Geometry和可见性剔除，共享同一个内部`LEDGlowRenderer`，每个控件每帧最多建立一个Glow Effect作用域。相邻Active Geometry的Glow允许自然融合，清晰Active本体在Effect作用域退出后重新绘制。
+最终实现使用`DrawingContext.PushEffect(BlurEffect, bounds)`隔离全部可见Active Geometry。Matrix与Segment分别完成基础Geometry和可见性剔除，共享同一个内部`LedGlowRenderer`，每个控件每帧最多建立一个Glow Effect作用域。相邻Active Geometry的Glow允许自然融合，清晰Active本体在Effect作用域退出后重新绘制。
 
 路线B章节中的Alpha Mask、LRU、16 MiB派生缓存、单Mask尺寸和降采样公式只记录被评估路线的工程要求，不再是正式路线C的实现契约。正式路线不得为了机械满足路线B要求而创建应用层Mask或Glow缓存。路线C仍必须执行以下资源安全约束：Effect Bounds只来自已剔除的可见Active Geometry并受控件内容视口限制；异常或空Bounds跳过Glow但保留Active本体；Glow关闭不提交Effect命令、不创建后端资源。
 

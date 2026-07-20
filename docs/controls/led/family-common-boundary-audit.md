@@ -1,9 +1,9 @@
 # LED 家族公共边界审计
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
 - 审计日期：2026-07-10
-- 审计对象：`LED.Segment` 与 `LED.Matrix`
+- 审计对象：`Led.Segment` 与 `Led.Matrix`
 - 目标：只提取已经由两套稳定实现证明语义相同的内部基础代码
 - 公共 API 变化：无
 
@@ -12,10 +12,10 @@
 当前 LED 家族共享两项内部基础设施：
 
 ```text
-LEDCharacterNormalizer
+LedCharacterNormalizer
   ASCII小写 -> 大写
 
-LEDDisplayLayoutMath
+LedDisplayLayoutMath
   理想尺寸 + 最终Bounds -> ScaleDown比例 + 内容对齐偏移
 ```
 
@@ -23,7 +23,7 @@ LEDDisplayLayoutMath
 
 ## 新增共享边界
 
-`LEDDisplayLayoutMath`直接位于`LED/`根目录，不新增`Primitives`、`Shared`或`Internal`目录。
+`LedDisplayLayoutMath` 直接位于 `src/AtomUI.Labs.Led/` 根目录，不新增 `Primitives`、`Shared` 或 `Internal` 目录。
 
 它只包含：
 
@@ -69,7 +69,7 @@ Matrix继续拥有：
 
 ## 验证结果
 
-- `LEDDisplayLayoutMathTests`：16/16通过。
+- `LedDisplayLayoutMathTests`：16/16通过。
 - 布局数学、Segment Render、Matrix Render/Pixel相关测试：92/92通过。
 - Labs全量测试：275/275通过，Release net10.0。
 - Labs Sample Debug/Release：均为0 warning、0 error。

@@ -1,8 +1,8 @@
 # LED Matrix 工业级实现原理
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
-本文记录 `AtomUI.Labs.Controls.LED.Matrix` 的目标实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
+本文记录 `AtomUI.Labs.Led.Matrix` 的目标实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
 
 第一版公共控件类型固定为 `MatrixDisplay`。第一版只实现单行静态 `5x7` 等宽点阵文本。
 
@@ -35,7 +35,7 @@
 Matrix 按当前真实职责组织：
 
 ```text
-LED/Matrix/
+src/AtomUI.Labs.Led/Matrix/
   MatrixDisplay.cs
   MatrixDisplayAutomationPeer.cs
   MatrixDotShape.cs
@@ -67,10 +67,10 @@ LED/Matrix/
 主题聚合链固定为：
 
 ```text
-AtomUILabsThemesProvider.axaml
-  -> LED/Themes/LEDThemes.axaml
-      -> LED/Matrix/Themes/MatrixThemes.axaml
-          -> LED/Matrix/Themes/MatrixDisplayTheme.axaml
+LedThemesProvider.axaml
+  -> Themes/LedThemes.axaml
+      -> Matrix/Themes/MatrixThemes.axaml
+          -> Matrix/Themes/MatrixDisplayTheme.axaml
 ```
 
 第一版不创建 Provider、FontSet、Primitives 或 Shared 目录。`Rendering/` 是性能基线证明逐点命令提交成本后形成的真实职责边界，不是为了机械复制 Segment。
@@ -354,7 +354,7 @@ Render
 
 不能默认偷偷缩小，也不能让绘制越过控件 Bounds 污染相邻视觉。
 
-ScaleDown比例和内容对齐偏移由LED家族根目录的`LEDDisplayLayoutMath`计算。Matrix仍自行判断`MatrixOverflowMode`，并保留可见视口逆变换和字符剔除逻辑；共享工具不参与layout、Geometry或Render命令提交。
+ScaleDown比例和内容对齐偏移由LED家族根目录的`LedDisplayLayoutMath`计算。Matrix仍自行判断`MatrixOverflowMode`，并保留可见视口逆变换和字符剔除逻辑；共享工具不参与layout、Geometry或Render命令提交。
 
 面板边框采用`Border + Padding + Glyph` Box Model。Measure在原内容DesiredSize外增加四边有效BorderThickness。Render按Background、内侧内容视口、Border顺序提交；内容对齐、裁剪和ScaleDown以Border内侧视口为边界，边框自身保持DIP厚度。Background铺满外框，因此半透明BorderBrush会与背景混色。
 
@@ -554,7 +554,7 @@ Labs 程序集通过 `https://atomui.net/labs` XML 命名空间公开 `MatrixDis
 Matrix 使用独立测量程序：
 
 ```text
-tools/performances/AtomUI.Desktop.Controls.Labs.Performance
+tools/performances/AtomUI.Labs.Led.Performance
 ```
 
 逐点基线位于 [matrix-performance-baseline.md](matrix-performance-baseline.md)，几何批处理结果位于 [matrix-performance-geometry-batch.md](matrix-performance-geometry-batch.md)，600帧常见动态负载位于 [matrix-performance-dynamic-load.md](matrix-performance-dynamic-load.md)，分配归因与36,000帧长稳结果位于 [matrix-performance-allocation-and-soak.md](matrix-performance-allocation-and-soak.md)。测量范围是 CPU 侧布局与 `DrawingGroup` 命令提交，不包含 GPU 或平台呈现成本，也不把机器相关毫秒数作为单元测试阈值。

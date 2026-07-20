@@ -1,9 +1,9 @@
 # Matrix MVP 收口审计
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
 - 审计日期：2026-07-10
-- 审计对象：`AtomUI.Desktop.Controls.Labs.LED.Matrix.MatrixDisplay`
+- 审计对象：`AtomUI.Labs.Led.Matrix.MatrixDisplay`
 - 审计类型：MVP 交付收口，不进行行为修改或性能优化
 - 结论：未发现高严重度运行缺陷；审计发现已于同日修复并进入回归验证
 
@@ -29,7 +29,7 @@
 
 - 项目结构树只展开 Segment，没有展开当前 Matrix 的 Character、Layout、Rendering 和 Themes 结构。
 - LED 家族章节仍写“未来 Matrix 应与 Segment 同级”，与当前源码不符。
-- 主题聚合链只写到 Segment，没有记录 `LEDThemes.axaml -> MatrixThemes.axaml -> MatrixDisplayTheme.axaml`。
+- 主题聚合链只写到 Segment，没有记录 `LedThemes.axaml -> MatrixThemes.axaml -> MatrixDisplayTheme.axaml`。
 - Namespace 策略仍把 `https://atomui.net/labs` 写成待评估选项，但程序集已经正式使用该 namespace。
 - 模块概览仍写“第一阶段只放入 Dashboard”，不能反映当前 Dashboard、Segment、Matrix 三个入口。
 - Token 章节包含 Matrix 落地前的后续假设，不符合当前状态文档应只描述已实现事实的要求。
@@ -90,7 +90,7 @@ Matrix 对 `DotSize`、间距和 Padding 有明确数值规整，但 `CornerRadi
 
 - Matrix 专项测试：114/114 通过，Release net10.0。
 - Labs 全量测试：259/259 通过，Release net10.0。
-- Labs NuGet pack：成功生成 `AtomUI.Desktop.Controls.Labs.6.0.8.nupkg`。
+- Labs NuGet pack：迁移后成功生成 `AtomUI.Labs.Led.6.0.8.nupkg`，同时包含 `net10.0` 与 `net8.0` 资产。
 - 包目标：`lib/net8.0`、`lib/net10.0`。
 - 包依赖：`AtomUI.Core 6.0.8`、`Avalonia 12.0.5`。
 - Sample Debug和Release build：均为0 warning，0 error。

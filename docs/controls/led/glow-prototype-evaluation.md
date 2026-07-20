@@ -1,10 +1,10 @@
 # LED Glow 首轮原型评估
 
-> 文档状态：迁移参考。本文于 2026-07-20 从 AtomUI 仓库的 `dev-and-mark/modules/desktop-controls-labs` 复制到 AtomUI.Labs 并适配文档结构。`AtomUI.Labs.Controls.LED` 表示本仓库的目标设计；文中的“已实现”、验证数据及旧项目命令来自迁移前的 `AtomUI.Desktop.Controls.Labs` 参考实现，不表示当前仓库已经包含相应源码、测试或性能工具。
+> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
 
 ## 评估状态
 
-本报告记录2026-07-11的首轮可行性Smoke，不是最终选型或正式性能结论。原型只存在于`AtomUI.Desktop.Controls.Labs.Performance`工具，不进入Labs运行时程序集。
+本报告记录2026-07-11的首轮可行性Smoke，不是最终选型或正式性能结论。原型只存在于`AtomUI.Labs.Led.Performance`工具，不进入Labs运行时程序集。
 
 ## Avalonia公开API审计
 
@@ -136,7 +136,7 @@ Scoped Blur行为Gate：
 
 ```text
 tools/performances/
-  AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop/
+  AtomUI.Labs.Led.GlowPrototype.Desktop/
 ```
 
 该项目引用Performance试验程序集并通过friend assembly复用同一份路线A与Scoped Blur Renderer，不复制算法，也不引用或修改Labs运行时Glow实现。它并排展示：
@@ -150,12 +150,12 @@ tools/performances/
 运行：
 
 ```powershell
-dotnet run --project tools\performances\AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop\AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop.csproj -c Release
+dotnet run --project tools\performances\AtomUI.Labs.Led.GlowPrototype.Desktop\AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release
 ```
 
 Release构建为0警告、0错误。短时真实Win32进程Smoke保持运行5秒且未提前退出；该结果只证明桌面生命周期和窗口建立成功，不代表人工视觉验收或真实GPU性能已经通过。
 
-桌面原型代码不进入NuGet包。最终选型后，失败路线和只服务对比的桌面原型应删除；有长期价值的性能Case改为直接测试正式LEDGlowRenderer和真实Matrix/Segment。
+桌面原型代码不进入NuGet包。最终选型后，失败路线和只服务对比的桌面原型应删除；有长期价值的性能Case改为直接测试正式LedGlowRenderer和真实Matrix/Segment。
 
 ## 第三轮：真实窗口Render回调压力Gate
 
@@ -166,7 +166,7 @@ Release构建为0警告、0错误。短时真实Win32进程Smoke保持运行5秒
 运行示例：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop/AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop.csproj -c Release --no-build -- --benchmark --route scoped --instances 64 --warmup 30 --ticks 120
+dotnet run --project tools/performances/AtomUI.Labs.Led.GlowPrototype.Desktop/AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --benchmark --route scoped --instances 64 --warmup 30 --ticks 120
 ```
 
 ### 五个独立进程
@@ -354,11 +354,11 @@ PerControl的P95比最佳Batch16高约1.4%，没有达到预先约定的15%改�
 - 正式Renderer先执行包含GlowRadius的可见性剔除，再在一个Effect作用域内绘制当前控件全部可见Active Geometry。
 - 相邻Geometry的Glow允许自然融合；退出Effect后重新绘制清晰Active本体。
 - `PerGeometry`、`Batch8`和`Batch16`不进入正式运行时，不增加粒度公开属性，也不根据运行负载动态切换算法。
-- 该决议结束技术路线与Effect粒度游移。下一阶段直接设计共享`LEDGlowRenderer`并接入Matrix/Segment。
+- 该决议结束技术路线与Effect粒度游移。下一阶段直接设计共享`LedGlowRenderer`并接入Matrix/Segment。
 
 ## 第七轮：正式控件接入
 
-Scoped Blur与PerControl粒度已进入`AtomUI.Desktop.Controls.Labs`正式运行时。共享实现位于`LED/Glow`，Matrix和Segment不复制Effect创建、数值规整或作用域释放逻辑。
+Scoped Blur 与 PerControl 粒度已进入 `AtomUI.Labs.Led` 正式运行时。共享实现位于 `Glow/`，Matrix 和 Segment 不复制 Effect 创建、数值规整或作用域释放逻辑。
 
 正式公共契约：
 
@@ -375,7 +375,7 @@ Scoped Blur与PerControl粒度已进入`AtomUI.Desktop.Controls.Labs`正式运�
 
 正式Render顺序固定为Background、Inactive、一次Scoped Glow、清晰Active、Matrix Border。Matrix和Segment均先按内容视口加有效GlowRadius执行可见字符剔除，再计算可见Active Geometry联合Bounds；不可见长文本不进入Effect。Glow处于现有内容Clip和布局Transform中，不参与Measure，ScaleDown同时缩放Geometry和Glow语义。
 
-关闭路径采用惰性Renderer：控件构造和`GlowBrush=null`稳态不创建`LEDGlowRenderer`或`BlurEffect`，不提交Effect作用域。首次有效Glow创建一个BlurEffect；Brush、Opacity和Radius变化复用同一实例。`GlowBrush`清回null时释放Renderer及其BlurEffect引用。
+关闭路径采用惰性Renderer：控件构造和`GlowBrush=null`稳态不创建`LedGlowRenderer`或`BlurEffect`，不提交Effect作用域。首次有效Glow创建一个BlurEffect；Brush、Opacity和Radius变化复用同一实例。`GlowBrush`清回null时释放Renderer及其BlurEffect引用。
 
 正式测试从334项增加到371项，新增覆盖：
 
@@ -431,7 +431,7 @@ Labs Sample增加Matrix默认关闭、Radius 6/12/24和多色Glow案例，以及
 运行方式：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Desktop.Controls.Labs.Performance/AtomUI.Desktop.Controls.Labs.Performance.csproj -c Release --no-build -- --formal-glow --frames 6000 --markdown output/formal-glow.md
+dotnet run --project tools/performances/AtomUI.Labs.Led.Performance/AtomUI.Labs.Led.Performance.csproj -c Release --no-build -- --formal-glow --frames 6000 --markdown output/formal-glow.md
 ```
 
 ## 第九轮：正式控件真实Win32窗口门禁
@@ -480,7 +480,7 @@ Segment在10实例60Hz时，NoGlow、Static和DynamicText均处于约62%同一�
 运行示例：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop/AtomUI.Desktop.Controls.Labs.GlowPrototype.Desktop.csproj -c Release --no-build -- --formal-controls --control matrix --mode opacity --instances 10 --hz 60 --warmup 30 --ticks 120
+dotnet run --project tools/performances/AtomUI.Labs.Led.GlowPrototype.Desktop/AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --formal-controls --control matrix --mode opacity --instances 10 --hz 60 --warmup 30 --ticks 120
 ```
 
 ## 第十轮：Segment基础Geometry命令聚合
