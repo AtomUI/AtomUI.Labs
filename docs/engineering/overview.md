@@ -29,6 +29,8 @@ docs/engineering/
 AtomUI.Labs.Controls.<ControlName>
 ```
 
+LED 控件家族沿用迁移时确定的独立包名 `AtomUI.Labs.Led`；其测试项目为 `AtomUI.Labs.Led.Tests`。这是显式命名例外，不改变后续控件的默认规则。
+
 测试项目使用：
 
 ```text
