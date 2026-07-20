@@ -260,7 +260,7 @@ public class SegmentDisplay : Control
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var layout = GetLayout(null);
+        var layout = GetLayout();
         return layout.DesiredSize;
     }
 
@@ -301,10 +301,13 @@ public class SegmentDisplay : Control
             -offset.Y / scale,
             Bounds.Width / scale,
             Bounds.Height / scale);
-        var effectiveGlowRadius = GetEffectiveGlowRadius();
-        if (effectiveGlowRadius > 0)
+        var glowBrush = GlowBrush;
+        var glowOpacity = LedGlowValueSanitizer.CoerceOpacity(GlowOpacity);
+        var glowRadius = LedGlowValueSanitizer.CoerceRadius(GlowRadius);
+        var hasGlow = glowBrush is not null && glowOpacity > 0 && glowRadius > 0;
+        if (hasGlow)
         {
-            visibleBounds = visibleBounds.Inflate(effectiveGlowRadius);
+            visibleBounds = visibleBounds.Inflate(glowRadius);
         }
 
         var firstVisibleIndex = FindFirstVisibleSlot(layout, visibleBounds.Left);
@@ -328,11 +331,16 @@ public class SegmentDisplay : Control
 
             if (visibleGeometry.ActiveGeometry is { } activeGeometry)
             {
-                using (var glowScope = PushGlow(context, activeGeometry.Bounds))
+                using (var glowScope = PushGlow(
+                           context,
+                           activeGeometry.Bounds,
+                           glowBrush,
+                           glowOpacity,
+                           glowRadius))
                 {
                     if (glowScope.IsActive)
                     {
-                        context.DrawGeometry(GlowBrush, null, activeGeometry);
+                        context.DrawGeometry(glowBrush, null, activeGeometry);
                     }
                 }
 
@@ -375,15 +383,15 @@ public class SegmentDisplay : Control
         }
     }
 
-    private SegmentDisplayLayout GetLayout(Size? finalSize)
+    private SegmentDisplayLayout GetLayout()
     {
-        var key = new SegmentLayoutCacheKey(Text, GetLayoutOptions(), finalSize);
+        var key = new SegmentLayoutCacheKey(Text, GetLayoutOptions());
         if (_hasLayoutCache && _layoutCacheKey == key && _layoutCache is not null)
         {
             return _layoutCache;
         }
 
-        var layout = SegmentLayoutEngine.Calculate(key.Text, key.Options, key.FinalSize);
+        var layout = SegmentLayoutEngine.Calculate(key.Text, key.Options);
         _layoutCacheKey = key;
         _layoutCache    = layout;
         _hasLayoutCache = true;
@@ -393,7 +401,7 @@ public class SegmentDisplay : Control
 
     private SegmentDisplayLayout GetPreparedLayout()
     {
-        return GetLayout(Bounds.Size);
+        return GetLayout();
     }
 
     private IReadOnlyList<SegmentPreparedSlot> GetPreparedSlots(SegmentDisplayLayout layout)
@@ -441,7 +449,9 @@ public class SegmentDisplay : Control
         context.DrawRectangle(
             background,
             null,
-            new RoundedRect(new Rect(0, 0, Bounds.Width, Bounds.Height), CornerRadius));
+            new RoundedRect(
+                new Rect(0, 0, Bounds.Width, Bounds.Height),
+                SegmentValueSanitizer.CoerceCornerRadius(CornerRadius)));
     }
 
     private SegmentLayoutOptions GetLayoutOptions()
@@ -593,18 +603,13 @@ public class SegmentDisplay : Control
         _visibleInactiveGeometryCache = null;
     }
 
-    private double GetEffectiveGlowRadius()
+    private LedGlowRenderScope PushGlow(
+        DrawingContext context,
+        Rect activeBounds,
+        IBrush? glowBrush,
+        double opacity,
+        double radius)
     {
-        return GlowBrush is not null && LedGlowValueSanitizer.CoerceOpacity(GlowOpacity) > 0
-            ? LedGlowValueSanitizer.CoerceRadius(GlowRadius)
-            : 0;
-    }
-
-    private LedGlowRenderScope PushGlow(DrawingContext context, Rect activeBounds)
-    {
-        var glowBrush = GlowBrush;
-        var opacity = LedGlowValueSanitizer.CoerceOpacity(GlowOpacity);
-        var radius = LedGlowValueSanitizer.CoerceRadius(GlowRadius);
         if (glowBrush is null || opacity <= 0 || radius <= 0)
         {
             return default;
@@ -650,8 +655,7 @@ public class SegmentDisplay : Control
 
     private readonly record struct SegmentLayoutCacheKey(
         string? Text,
-        SegmentLayoutOptions Options,
-        Size? FinalSize);
+        SegmentLayoutOptions Options);
 
     private readonly record struct SegmentPreparedSlot(
         SegmentCharacterKind Kind,

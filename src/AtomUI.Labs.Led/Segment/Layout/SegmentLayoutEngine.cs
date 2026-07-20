@@ -10,8 +10,7 @@ internal static class SegmentLayoutEngine
 
     public static SegmentDisplayLayout Calculate(
         string? text,
-        SegmentLayoutOptions options,
-        Size? finalSize = null)
+        SegmentLayoutOptions options)
     {
         var patterns = BuildPatterns(text);
         if (patterns.Count == 0)
@@ -24,16 +23,8 @@ internal static class SegmentLayoutEngine
 
         var padding         = SegmentValueSanitizer.CoerceThickness(options.Padding);
         var characterHeight = SegmentValueSanitizer.CoerceNonNegative(options.CharacterHeight);
-        if (finalSize.HasValue && SegmentValueSanitizer.IsFinite(finalSize.Value.Height))
-        {
-            var constrainedHeight = SegmentValueSanitizer.CoerceNonNegative(finalSize.Value.Height - padding.Top - padding.Bottom);
-            if (constrainedHeight > 0)
-            {
-                characterHeight = constrainedHeight;
-            }
-        }
-
-        var characterWidth = characterHeight * SegmentValueSanitizer.CoerceAtLeast(options.CharacterAspectRatio, 0.1);
+        var characterWidth = SegmentValueSanitizer.CoerceNonNegative(
+            characterHeight * SegmentValueSanitizer.CoerceAtLeast(options.CharacterAspectRatio, 0.1));
         var spacing        = SegmentValueSanitizer.CoerceNonNegative(options.CharacterSpacing);
         var x              = padding.Left;
         var slots          = new List<SegmentCharacterSlot>(patterns.Count);
