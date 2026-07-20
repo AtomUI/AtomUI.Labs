@@ -12,7 +12,7 @@ using Avalonia.VisualTree;
 
 namespace AtomUILabsGallery.ShowCases.Led;
 
-public sealed class LedGlowWorkbench : StackPanel, IDisposable
+public sealed class LedGlowWorkbench : StackPanel
 {
     private static readonly GlowBrushOption[] BrushOptions =
     [
@@ -33,7 +33,15 @@ public sealed class LedGlowWorkbench : StackPanel, IDisposable
     private readonly TextBlock _opacityValue;
     private readonly TextBlock _radiusValue;
     private CancellationTokenSource? _animationCancellation;
-    private bool _disposed;
+    private bool _isAttachedToVisualTree;
+
+    internal bool HasActiveAnimation => _animationCancellation is { IsCancellationRequested: false };
+
+    internal int AnimationModeIndex
+    {
+        get => _mode.SelectedIndex;
+        set => _mode.SelectedIndex = value;
+    }
 
     public LedGlowWorkbench()
     {
@@ -107,30 +115,21 @@ public sealed class LedGlowWorkbench : StackPanel, IDisposable
         _mode.SelectionChanged += HandleConfigurationChanged;
         _opacity.PropertyChanged += HandleSliderPropertyChanged;
         _radius.PropertyChanged += HandleSliderPropertyChanged;
+        AttachedToVisualTree += HandleAttachedToVisualTree;
         DetachedFromVisualTree += HandleDetachedFromVisualTree;
         ApplyConfiguration();
     }
 
-    public void Dispose()
+    private void HandleAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _disposed = true;
-        _enabled.IsCheckedChanged -= HandleConfigurationChanged;
-        _brush.SelectionChanged -= HandleConfigurationChanged;
-        _mode.SelectionChanged -= HandleConfigurationChanged;
-        _opacity.PropertyChanged -= HandleSliderPropertyChanged;
-        _radius.PropertyChanged -= HandleSliderPropertyChanged;
-        DetachedFromVisualTree -= HandleDetachedFromVisualTree;
-        CancelAnimations();
+        _isAttachedToVisualTree = true;
+        ApplyConfiguration();
     }
 
     private void HandleDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
-        Dispose();
+        _isAttachedToVisualTree = false;
+        CancelAnimations();
     }
 
     private void HandleConfigurationChanged(object? sender, EventArgs e)
@@ -155,7 +154,7 @@ public sealed class LedGlowWorkbench : StackPanel, IDisposable
         var brush = enabled ? CreateSelectedBrush() : null;
         ApplyStaticValues(_matrix, brush);
         ApplyStaticValues(_segment, brush);
-        if (!enabled || _mode.SelectedIndex == 0)
+        if (!_isAttachedToVisualTree || !enabled || _mode.SelectedIndex == 0)
         {
             return;
         }
