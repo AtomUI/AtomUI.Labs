@@ -26,15 +26,18 @@ public class MatrixMarqueeLifecycleTests
             window.Show();
             Dispatcher.UIThread.RunJobs();
             display.IsMarqueeAnimationRunning.ShouldBeTrue();
+            display.MarqueeVisibilitySubscriptionCount.ShouldBeGreaterThan(0);
 
             display.IsMarqueeEnabled = false;
             Dispatcher.UIThread.RunJobs();
             display.IsMarqueeAnimationRunning.ShouldBeFalse();
             display.MarqueeProgress.ShouldBe(0);
+            display.MarqueeVisibilitySubscriptionCount.ShouldBe(0);
 
             display.IsMarqueeEnabled = true;
             Dispatcher.UIThread.RunJobs();
             display.IsMarqueeAnimationRunning.ShouldBeTrue();
+            display.MarqueeVisibilitySubscriptionCount.ShouldBeGreaterThan(0);
         }
         finally
         {
@@ -43,6 +46,28 @@ public class MatrixMarqueeLifecycleTests
 
         display.IsMarqueeAnimationRunning.ShouldBeFalse();
         display.MarqueeProgress.ShouldBe(0);
+        display.MarqueeVisibilitySubscriptionCount.ShouldBe(0);
+    }
+
+    [Fact]
+    public void AttachedStaticDisplay_ShouldNotSubscribeToAncestorVisibility()
+    {
+        var display = CreateDisplay();
+        display.IsMarqueeEnabled = false;
+        var window = new Window { Width = 320, Height = 100, Content = new Border { Child = display } };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            display.MarqueeVisibilitySubscriptionCount.ShouldBe(0);
+            display.IsMarqueeAnimationRunning.ShouldBeFalse();
+        }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [Fact]
@@ -66,6 +91,36 @@ public class MatrixMarqueeLifecycleTests
             display.Text = "MATRIX";
             display.IsVisible = false;
             display.IsMarqueeAnimationRunning.ShouldBeFalse();
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [Fact]
+    public void ParentVisibility_ShouldSuspendAndResumeAnimation()
+    {
+        var display = CreateDisplay();
+        var parent = new Border { Child = display };
+        var window = new Window { Width = 320, Height = 100, Content = parent };
+
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            display.IsMarqueeAnimationRunning.ShouldBeTrue();
+
+            parent.IsVisible = false;
+            Dispatcher.UIThread.RunJobs();
+            display.IsEffectivelyVisible.ShouldBeFalse();
+            display.IsMarqueeAnimationRunning.ShouldBeFalse();
+            display.MarqueeProgress.ShouldBe(0);
+
+            parent.IsVisible = true;
+            Dispatcher.UIThread.RunJobs();
+            display.IsEffectivelyVisible.ShouldBeTrue();
+            display.IsMarqueeAnimationRunning.ShouldBeTrue();
         }
         finally
         {

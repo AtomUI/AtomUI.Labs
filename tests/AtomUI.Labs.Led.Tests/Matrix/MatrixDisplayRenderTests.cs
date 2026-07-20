@@ -335,6 +335,32 @@ public class MatrixDisplayRenderTests
         transform.Value.M31.ShouldBe(600 - (600 + contentWidth) * progress, 0.0001);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(double.NaN)]
+    [InlineData(double.NegativeInfinity)]
+    public void Render_ShouldFallbackToStaticContentWhenMarqueeSpeedIsNotEffective(double speed)
+    {
+        var display = CreateDisplay("MATRIX");
+        display.IsMarqueeEnabled = true;
+        display.MarqueeSpeed = speed;
+        display.HorizontalContentAlignment = HorizontalAlignment.Left;
+        display.MarqueeProgress = 0;
+        var staticDisplay = CreateDisplay("MATRIX");
+        staticDisplay.HorizontalContentAlignment = HorizontalAlignment.Left;
+
+        var transform = FindLayoutTransform(RenderToDrawingGroup(display));
+        var staticTransform = FindLayoutTransform(RenderToDrawingGroup(staticDisplay));
+        var dots = RenderToGlyphLayerDrawings(display).ToList();
+        var staticDots = RenderToGlyphLayerDrawings(staticDisplay).ToList();
+
+        transform.ShouldNotBeNull();
+        staticTransform.ShouldNotBeNull();
+        transform.Value.ShouldBe(staticTransform.Value);
+        dots.Count.ShouldBe(staticDots.Count);
+        dots.ShouldNotBeEmpty();
+    }
+
     [Fact]
     public void Render_ShouldKeepLongMarqueeWorkBoundedByViewport()
     {
