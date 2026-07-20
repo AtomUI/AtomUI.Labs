@@ -1,0 +1,19 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:atom="https://atomui.net"
+                    xmlns:segment="clr-namespace:AtomUI.Labs.Led.Segment"
+                    x:ClassModifier="internal">
+    <ControlTheme x:Key="{x:Type segment:SegmentDisplay}"
+                  TargetType="segment:SegmentDisplay">
+        <Setter Property="Background"
+                Value="{atom:SharedTokenResource ColorBgContainer}" />
+        <Setter Property="CornerRadius"
+                Value="{atom:SharedTokenResource BorderRadiusLG}" />
+        <Setter Property="Padding"
+                Value="{atom:SharedTokenResource PaddingLG}" />
+        <Setter Property="ActiveBrush"
+                Value="{atom:SharedTokenResource ColorPrimary}" />
+        <Setter Property="InactiveBrush"
+                Value="{atom:SharedTokenResource ColorFillTertiary}" />
+    </ControlTheme>
+</ResourceDictionary>
