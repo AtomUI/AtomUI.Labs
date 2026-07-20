@@ -4,6 +4,7 @@ using AtomUI.Icons.AntDesign;
 using AtomUI.Toolkits.GalleryBase.Configuration;
 using AtomUI.Toolkits.GalleryBase.Routing;
 using AtomUILabsGallery.ShowCases;
+using AtomUILabsGallery.ShowCases.Led;
 using Avalonia.Controls;
 using ReactiveUI;
 
@@ -51,13 +52,15 @@ public static class AtomUILabsGalleryModule
         navigation.AddPage(OverviewViewModel.ID, "Overview", Icon(AntDesignIconKind.HomeOutlined));
 
         var labs = navigation.AddGroup("Labs", "Labs Controls", Icon(AntDesignIconKind.AppstoreOutlined));
-        labs.AddPage(BlankViewModel.ID, "Blank Showcase", Icon(AntDesignIconKind.ExperimentOutlined));
+        labs.AddPage(LedSegmentViewModel.ID, "LED Segment Display", Icon(AntDesignIconKind.FieldNumberOutlined));
+        labs.AddPage(LedMatrixViewModel.ID, "LED Matrix Display", Icon(AntDesignIconKind.TableOutlined));
     }
 
     private static void ConfigureRoutes(GalleryRouteRegistry routes)
     {
         routes.Map(OverviewViewModel.ID, screen => new OverviewViewModel(screen), () => new OverviewShowCase());
-        routes.Map(BlankViewModel.ID, screen => new BlankViewModel(screen), () => new BlankShowCase());
+        routes.Map(LedSegmentViewModel.ID, screen => new LedSegmentViewModel(screen), () => new LedSegmentShowCase());
+        routes.Map(LedMatrixViewModel.ID, screen => new LedMatrixViewModel(screen), () => new LedMatrixShowCase());
     }
 
     private static Func<PathIcon> Icon(AntDesignIconKind kind)

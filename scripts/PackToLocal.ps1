@@ -10,6 +10,18 @@ $solutionPath = Join-Path $repoRoot "AtomUI.Labs.slnx"
 $srcDir = Join-Path $repoRoot "src"
 $testsDir = Join-Path $repoRoot "tests"
 
+function Invoke-DotNet {
+    param (
+        [Parameter(ValueFromRemainingArguments = $true)]
+        [string[]]$Arguments
+    )
+
+    & dotnet @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet $($Arguments -join ' ') failed with exit code $LASTEXITCODE."
+    }
+}
+
 function Resolve-ProjectPath {
     param (
         [Parameter(Mandatory = $true)]
@@ -23,13 +35,13 @@ function Resolve-ProjectPath {
     return (Get-Item -Path (Join-Path $repoRoot $ProjectPath)).FullName
 }
 
-dotnet restore $solutionPath
-dotnet build $solutionPath --configuration $BuildType --no-restore
+Invoke-DotNet restore $solutionPath --property:Configuration=$BuildType --property:GalleryPublishAot=false
+Invoke-DotNet build $solutionPath --configuration $BuildType --no-restore --property:GalleryPublishAot=false
 
 if (Test-Path $testsDir) {
     $testProjects = Get-ChildItem -Path $testsDir -Filter "*.csproj" -Recurse -File
     foreach ($testProject in $testProjects) {
-        dotnet test $testProject.FullName --framework net10.0 --configuration $BuildType --no-build
+        Invoke-DotNet test $testProject.FullName --framework net10.0 --configuration $BuildType --no-build
     }
 }
 
@@ -53,6 +65,5 @@ if (-not $packableProjects -or $packableProjects.Count -eq 0) {
 }
 
 foreach ($project in $packableProjects) {
-    dotnet pack $project --configuration $BuildType --no-build
+    Invoke-DotNet pack $project --configuration $BuildType --no-build
 }
-

@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="../../src/AtomUI.Labs.Led/AtomUI.Labs.Led.csproj"/>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="AtomUI.Desktop.Controls"/>
         <PackageReference Include="AtomUI.Toolkits.GalleryBase"/>
