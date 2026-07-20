@@ -47,6 +47,21 @@ public class SegmentDisplayMeasureTests
     }
 
     [Fact]
+    public void Measure_ShouldKeepDesiredSizeFiniteForExtremeFiniteInputs()
+    {
+        var display = CreateDisplay("8888");
+        display.CharacterHeight = double.MaxValue;
+        display.CharacterAspectRatio = double.MaxValue;
+        display.CharacterSpacing = double.MaxValue;
+        display.Padding = new Thickness(double.MaxValue);
+
+        display.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+
+        double.IsFinite(display.DesiredSize.Width).ShouldBeTrue();
+        double.IsFinite(display.DesiredSize.Height).ShouldBeTrue();
+    }
+
+    [Fact]
     public void Measure_ShouldNotDependOnSegmentThicknessOrGap()
     {
         var display = CreateDisplay("88.8");

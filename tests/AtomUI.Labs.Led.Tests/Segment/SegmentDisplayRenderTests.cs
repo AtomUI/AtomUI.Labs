@@ -305,6 +305,57 @@ public class SegmentDisplayRenderTests
     }
 
     [Fact]
+    public void Render_ShouldPreserveConfiguredHeightForClipOverflow()
+    {
+        var display = CreateDisplay("8");
+        display.Background = null;
+        display.CharacterHeight = 72;
+        display.OverflowMode = SegmentOverflowMode.Clip;
+        display.Measure(new Size(30, 24));
+        display.Arrange(new Rect(0, 0, 30, 24));
+
+        var drawingGroup = RenderToDrawingGroup(display);
+        var transform = FindLayoutTransform(drawingGroup);
+
+        transform.ShouldNotBeNull();
+        transform.Value.M11.ShouldBe(1);
+        transform.Value.M22.ShouldBe(1);
+        display.VisibleActiveGeometry.ShouldNotBeNull();
+        display.VisibleActiveGeometry.Bounds.Height.ShouldBeGreaterThan(24);
+    }
+
+    [Fact]
+    public void Render_ShouldApplyVerticalAlignmentWhenContentHasExtraHeight()
+    {
+        var display = CreateDisplay("8");
+        display.Background = null;
+        display.CharacterHeight = 40;
+        display.VerticalContentAlignment = VerticalAlignment.Bottom;
+        display.Measure(new Size(200, 120));
+        display.Arrange(new Rect(0, 0, 200, 120));
+
+        var transform = FindLayoutTransform(RenderToDrawingGroup(display));
+
+        transform.ShouldNotBeNull();
+        transform.Value.M32.ShouldBe(80);
+    }
+
+    [Theory]
+    [InlineData(double.NaN, -1, double.PositiveInfinity, 2)]
+    [InlineData(double.MaxValue, double.MaxValue, double.MaxValue, double.MaxValue)]
+    public void Render_ShouldCoerceInvalidCornerRadius(
+        double topLeft,
+        double topRight,
+        double bottomRight,
+        double bottomLeft)
+    {
+        var display = CreateDisplay("8");
+        display.CornerRadius = new CornerRadius(topLeft, topRight, bottomRight, bottomLeft);
+
+        Should.NotThrow(() => RenderToDrawingGroup(display));
+    }
+
+    [Fact]
     public void Render_ShouldNotScaleUpWhenScaleDownContentHasExtraSpace()
     {
         var display = CreateDisplay("12");

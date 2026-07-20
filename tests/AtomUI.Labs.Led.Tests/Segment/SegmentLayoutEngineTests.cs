@@ -1,3 +1,4 @@
+using AtomUI.Labs.Led.Segment;
 using AtomUI.Labs.Led.Segment.Character;
 using AtomUI.Labs.Led.Segment.Layout;
 using Avalonia;
@@ -59,31 +60,18 @@ public class SegmentLayoutEngineTests
     }
 
     [Fact]
-    public void Calculate_ShouldUseFinalHeightWhenAvailable()
+    public void Calculate_ShouldKeepConfiguredHeightIndependentOfFinalBounds()
     {
         var layout = SegmentLayoutEngine.Calculate(
             "8",
             CreateOptions(
                 characterHeight: 40,
                 characterAspectRatio: 0.5,
-                padding: new Thickness(2, 3, 4, 5)),
-            new Size(200, 128));
-
-        layout.Slots[0].Bounds.Height.ShouldBe(120);
-        layout.Slots[0].Bounds.Width.ShouldBe(60);
-        layout.DesiredSize.ShouldBe(new Size(66, 128));
-    }
-
-    [Fact]
-    public void Calculate_ShouldKeepConfiguredHeightWhenFinalHeightIsInfinity()
-    {
-        var layout = SegmentLayoutEngine.Calculate(
-            "8",
-            CreateOptions(characterHeight: 40, characterAspectRatio: 0.5),
-            new Size(200, double.PositiveInfinity));
+                padding: new Thickness(2, 3, 4, 5)));
 
         layout.Slots[0].Bounds.Height.ShouldBe(40);
         layout.Slots[0].Bounds.Width.ShouldBe(20);
+        layout.DesiredSize.ShouldBe(new Size(26, 48));
     }
 
     [Fact]
@@ -112,6 +100,28 @@ public class SegmentLayoutEngineTests
         layout.DesiredSize.ShouldBe(new Size(0, 2));
         layout.Slots[0].Bounds.ShouldBe(new Rect(0, 0, 0, 0));
         layout.Slots[1].Bounds.ShouldBe(new Rect(0, 0, 0, 0));
+    }
+
+    [Fact]
+    public void Calculate_ShouldCapExtremeFiniteLayoutInputs()
+    {
+        var layout = SegmentLayoutEngine.Calculate(
+            "8888",
+            CreateOptions(
+                characterHeight: double.MaxValue,
+                characterAspectRatio: double.MaxValue,
+                characterSpacing: double.MaxValue,
+                padding: new Thickness(double.MaxValue)));
+
+        double.IsFinite(layout.DesiredSize.Width).ShouldBeTrue();
+        double.IsFinite(layout.DesiredSize.Height).ShouldBeTrue();
+        layout.Slots.ShouldAllBe(slot =>
+            double.IsFinite(slot.Bounds.X)
+            && double.IsFinite(slot.Bounds.Y)
+            && double.IsFinite(slot.Bounds.Width)
+            && double.IsFinite(slot.Bounds.Height));
+        layout.Slots[0].Bounds.Width.ShouldBe(SegmentValueSanitizer.MaximumLayoutValue);
+        layout.Slots[0].Bounds.Height.ShouldBe(SegmentValueSanitizer.MaximumLayoutValue);
     }
 
     private static SegmentLayoutOptions CreateOptions(
