@@ -1,11 +1,18 @@
 namespace AtomUI.Labs.Led.Marquee;
 
-internal sealed class LeftThroughMarqueeMotion : IMarqueeMotion
+internal static class LeftThroughMarqueeMotion
 {
-    public MarqueeRenderPlan Calculate(in MarqueeMotionContext context)
+    public static MarqueeRenderPlan Calculate(in MarqueeMotionContext context)
     {
         var progress = double.IsNaN(context.Progress) ? 0 : Math.Clamp(context.Progress, 0, 1);
-        var distance = Math.Max(0, context.ViewportWidth) + Math.Max(0, context.ContentWidth);
-        return new MarqueeRenderPlan(1, Math.Max(0, context.ViewportWidth) - distance * progress);
+        var viewportWidth = CoerceDimension(context.ViewportWidth);
+        var contentWidth = CoerceDimension(context.ContentWidth);
+        var distance = viewportWidth + contentWidth;
+        return new MarqueeRenderPlan(1, viewportWidth - distance * progress);
+    }
+
+    private static double CoerceDimension(double value)
+    {
+        return double.IsFinite(value) && value > 0 ? value : 0;
     }
 }
