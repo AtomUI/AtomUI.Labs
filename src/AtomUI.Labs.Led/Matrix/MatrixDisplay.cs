@@ -262,14 +262,16 @@ public class MatrixDisplay : Control
 
     internal object? MarqueeController => _marqueeController;
 
+    internal int MarqueeVisibilitySubscriptionCount => _visibilityAncestors.Count;
+
     #endregion
 
     private bool _hasLayoutCache;
-    private static readonly IMarqueeMotion MarqueeMotion = new LeftThroughMarqueeMotion();
     private LedGlowRenderer? _glowRenderer;
     private LedMarqueeController? _marqueeController;
     private Size _arrangedSize;
     private bool _isAttachedToVisualTree;
+    private readonly List<Visual> _visibilityAncestors = new();
     private MatrixLayoutCacheKey _layoutCacheKey;
     private MatrixDisplayLayout? _layoutCache;
     private readonly Dictionary<MatrixGlyphGeometryCacheKey, MatrixGlyphGeometry> _geometryCache = new();
@@ -337,12 +339,14 @@ public class MatrixDisplay : Control
     {
         base.OnAttachedToVisualTree(e);
         _isAttachedToVisualTree = true;
+        UpdateAncestorVisibilitySubscriptions();
         UpdateMarqueeAnimation();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _isAttachedToVisualTree = false;
+        UnsubscribeFromAncestorVisibility();
         ReleaseMarqueeController();
         base.OnDetachedFromVisualTree(e);
     }
@@ -407,6 +411,11 @@ public class MatrixDisplay : Control
             _glowRenderer = null;
         }
 
+        if (change.Property == IsMarqueeEnabledProperty)
+        {
+            UpdateAncestorVisibilitySubscriptions();
+        }
+
         if (change.Property == TextProperty
             || change.Property == DotSizeProperty
             || change.Property == DotSpacingProperty
@@ -433,9 +442,10 @@ public class MatrixDisplay : Control
         var layout = GetLayout();
         var options = GetLayoutOptions();
         var contentViewport = GetContentViewport();
-        if (IsMarqueeEnabled && layout.Slots.Count > 0)
+        var glow = GetGlowRenderOptions();
+        if (IsEffectiveMarqueeEnabled() && layout.Slots.Count > 0)
         {
-            RenderMarqueeContent(context, layout, options, contentViewport, activeBrush);
+            RenderMarqueeContent(context, layout, options, contentViewport, activeBrush, glow);
             return;
         }
 
@@ -457,7 +467,7 @@ public class MatrixDisplay : Control
             contentViewport.X + alignmentOffset.X,
             contentViewport.Y + alignmentOffset.Y);
         var visibleBounds = CalculateVisibleBounds(contentViewport, scale, offset);
-        var effectiveGlowRadius = GetEffectiveGlowRadius();
+        var effectiveGlowRadius = glow.EffectiveRadius;
         if (effectiveGlowRadius > 0)
         {
             visibleBounds = visibleBounds.Inflate(effectiveGlowRadius);
@@ -465,7 +475,7 @@ public class MatrixDisplay : Control
         using (context.PushClip(contentViewport))
         using (PushLayoutTransform(context, scale, offset))
         {
-            RenderVisibleGlyphs(context, layout, visibleBounds, options, activeBrush);
+            RenderVisibleGlyphs(context, layout, visibleBounds, options, activeBrush, glow);
         }
     }
 
@@ -474,7 +484,8 @@ public class MatrixDisplay : Control
         MatrixDisplayLayout layout,
         MatrixLayoutOptions options,
         Rect contentViewport,
-        IBrush activeBrush)
+        IBrush activeBrush,
+        MatrixGlowRenderOptions glow)
     {
         if (contentViewport.Width <= 0 || contentViewport.Height <= 0)
         {
@@ -487,7 +498,7 @@ public class MatrixDisplay : Control
             1,
             HorizontalAlignment.Left,
             VerticalContentAlignment).Y;
-        var plan = MarqueeMotion.Calculate(new MarqueeMotionContext(
+        var plan = LeftThroughMarqueeMotion.Calculate(new MarqueeMotionContext(
             contentViewport.Width,
             layout.DesiredSize.Width,
             MarqueeProgress));
@@ -500,7 +511,7 @@ public class MatrixDisplay : Control
                     contentViewport.X + plan.GetX(i),
                     contentViewport.Y + verticalOffset);
                 var visibleBounds = CalculateVisibleBounds(contentViewport, 1, offset);
-                var effectiveGlowRadius = GetEffectiveGlowRadius();
+                var effectiveGlowRadius = glow.EffectiveRadius;
                 if (effectiveGlowRadius > 0)
                 {
                     visibleBounds = visibleBounds.Inflate(effectiveGlowRadius);
@@ -508,7 +519,7 @@ public class MatrixDisplay : Control
 
                 using (PushLayoutTransform(context, 1, offset))
                 {
-                    RenderVisibleGlyphs(context, layout, visibleBounds, options, activeBrush);
+                    RenderVisibleGlyphs(context, layout, visibleBounds, options, activeBrush, glow);
                 }
             }
         }
@@ -516,7 +527,10 @@ public class MatrixDisplay : Control
 
     private void UpdateMarqueeAnimation()
     {
-        if (!_isAttachedToVisualTree || !IsVisible || !IsMarqueeEnabled || string.IsNullOrEmpty(Text))
+        if (!_isAttachedToVisualTree
+            || !IsEffectivelyVisible
+            || !IsEffectiveMarqueeEnabled()
+            || string.IsNullOrEmpty(Text))
         {
             ReleaseMarqueeController();
             return;
@@ -543,6 +557,51 @@ public class MatrixDisplay : Control
     {
         _marqueeController?.Dispose();
         _marqueeController = null;
+    }
+
+    private bool IsEffectiveMarqueeEnabled()
+    {
+        return IsMarqueeEnabled && LedMarqueeValueSanitizer.CoerceSpeed(MarqueeSpeed) > 0;
+    }
+
+    private void UpdateAncestorVisibilitySubscriptions()
+    {
+        if (_isAttachedToVisualTree && IsMarqueeEnabled)
+        {
+            SubscribeToAncestorVisibility();
+        }
+        else
+        {
+            UnsubscribeFromAncestorVisibility();
+        }
+    }
+
+    private void SubscribeToAncestorVisibility()
+    {
+        UnsubscribeFromAncestorVisibility();
+        foreach (var ancestor in this.GetVisualAncestors())
+        {
+            ancestor.PropertyChanged += HandleAncestorPropertyChanged;
+            _visibilityAncestors.Add(ancestor);
+        }
+    }
+
+    private void UnsubscribeFromAncestorVisibility()
+    {
+        foreach (var ancestor in _visibilityAncestors)
+        {
+            ancestor.PropertyChanged -= HandleAncestorPropertyChanged;
+        }
+
+        _visibilityAncestors.Clear();
+    }
+
+    private void HandleAncestorPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == IsVisibleProperty)
+        {
+            UpdateMarqueeAnimation();
+        }
     }
 
     private MatrixDisplayLayout GetLayout()
@@ -668,25 +727,26 @@ public class MatrixDisplay : Control
             viewport.Height / scale);
     }
 
-    private double GetEffectiveGlowRadius()
+    private MatrixGlowRenderOptions GetGlowRenderOptions()
     {
-        return GlowBrush is not null && LedGlowValueSanitizer.CoerceOpacity(GlowOpacity) > 0
-            ? LedGlowValueSanitizer.CoerceRadius(GlowRadius)
-            : 0;
+        return new MatrixGlowRenderOptions(
+            GlowBrush,
+            LedGlowValueSanitizer.CoerceOpacity(GlowOpacity),
+            LedGlowValueSanitizer.CoerceRadius(GlowRadius));
     }
 
-    private LedGlowRenderScope PushGlow(DrawingContext context, Rect activeBounds)
+    private LedGlowRenderScope PushGlow(
+        DrawingContext context,
+        Rect activeBounds,
+        in MatrixGlowRenderOptions glow)
     {
-        var glowBrush = GlowBrush;
-        var opacity = LedGlowValueSanitizer.CoerceOpacity(GlowOpacity);
-        var radius = LedGlowValueSanitizer.CoerceRadius(GlowRadius);
-        if (glowBrush is null || opacity <= 0 || radius <= 0)
+        if (!glow.IsActive)
         {
             return default;
         }
 
         _glowRenderer ??= new LedGlowRenderer();
-        return _glowRenderer.Push(context, glowBrush, opacity, radius, activeBounds);
+        return _glowRenderer.Push(context, glow.Brush, glow.Opacity, glow.Radius, activeBounds);
     }
 
     private void RenderVisibleGlyphs(
@@ -694,7 +754,8 @@ public class MatrixDisplay : Control
         MatrixDisplayLayout layout,
         Rect visibleBounds,
         MatrixLayoutOptions options,
-        IBrush activeBrush)
+        IBrush activeBrush,
+        in MatrixGlowRenderOptions glow)
     {
         if (layout.Slots.Count == 0)
         {
@@ -714,16 +775,23 @@ public class MatrixDisplay : Control
 
         if (TryCalculateActiveBounds(layout, options, firstVisibleIndex, lastVisibleIndex, out var activeBounds))
         {
-            using (var glowScope = PushGlow(context, activeBounds))
+            using (var glowScope = PushGlow(context, activeBounds, glow))
             {
                 if (glowScope.IsActive)
                 {
-                    RenderActiveGlyphs(context, layout, options, firstVisibleIndex, lastVisibleIndex, GlowBrush!);
+                    RenderActiveGlyphs(context, layout, options, firstVisibleIndex, lastVisibleIndex, glow.Brush!);
                 }
             }
         }
 
         RenderActiveGlyphs(context, layout, options, firstVisibleIndex, lastVisibleIndex, activeBrush);
+    }
+
+    private readonly record struct MatrixGlowRenderOptions(IBrush? Brush, double Opacity, double Radius)
+    {
+        public bool IsActive => Brush is not null && Opacity > 0 && Radius > 0;
+
+        public double EffectiveRadius => IsActive ? Radius : 0;
     }
 
     private static int FindLastVisibleSlot(MatrixDisplayLayout layout, double visibleRight, int firstVisibleIndex)
