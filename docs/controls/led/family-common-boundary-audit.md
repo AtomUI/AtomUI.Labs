@@ -1,6 +1,6 @@
 # LED 家族公共边界审计
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：历史审计记录（审计日期 2026-07-10）。结论用于解释共享边界的形成过程；其中宿主名称、构建结果和测试数量不是当前验证状态，当前契约以 [overview](overview.md) 为准。
 
 - 审计日期：2026-07-10
 - 审计对象：`Led.Segment` 与 `Led.Matrix`
@@ -39,7 +39,7 @@ Segment和Matrix仍各自判断自己的公开`OverflowMode`是否为`ScaleDown`
 | `SegmentOverflowMode` / `MatrixOverflowMode` | 不共享 | 二者是已经冻结的独立公开合同，合并会造成API变更和路线耦合 |
 | StyledProperty与控件基类 | 不共享 | 公共基类会扩大公开API，并把两条显示路线强制绑定到同一继承合同 |
 | ValueSanitizer | 不共享 | Matrix对布局参数设置`1,000,000`上限；Segment没有该上限且额外支持范围规整 |
-| LayoutEngine、Layout、Slot | 不共享 | Segment支持窄符号和最终高度约束；Matrix使用固定5x7等宽Rune布局 |
+| LayoutEngine、Layout、Slot | 不共享 | Segment使用十四段字符格并支持窄符号；Matrix使用固定5x7等宽Rune布局 |
 | CharacterMap与fallback | 不共享 | Segment未知字符为空格，Matrix未知Unicode标量为问号，语义不同 |
 | Geometry与缓存 | 不共享 | Segment缓存字符槽拓扑和十四段骨架；Matrix按字模bit缓存亮暗点Geometry |
 | AutomationPeer | 不共享 | 外壳相似，但提取需要基类、接口或委托，两个消费者不足以抵消复杂度 |
@@ -50,7 +50,7 @@ Segment和Matrix仍各自判断自己的公开`OverflowMode`是否为`ScaleDown`
 
 Segment继续拥有：
 
-- 最终Bounds参与字符高度布局。
+- 基于 `CharacterHeight` 生成理想布局，并在绘制阶段处理最终 Bounds、对齐和溢出。
 - Segment专属几何缓存与Glow绘制。
 - 将`SegmentOverflowMode`映射为是否调用共享ScaleDown计算。
 
