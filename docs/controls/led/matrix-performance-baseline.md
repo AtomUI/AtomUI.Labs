@@ -1,6 +1,6 @@
 # Matrix Interaction Performance Baseline
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：历史性能快照。下列数值只适用于文内日期、配置和机器，不代表当前性能；回归时必须重新运行本仓库 runner。
 
 - Date: 2026-07-10 17:22:19 +08:00
 - Configuration: Release, .NET 10

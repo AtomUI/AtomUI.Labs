@@ -1,10 +1,10 @@
 # LED Matrix 工业级实现原理
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：当前实现契约，更新于 2026-07-20。性能数值链接指向带日期的历史证据，不代表当前机器基线。
 
-本文记录 `AtomUI.Labs.Led.Matrix` 的目标实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
+本文记录 `AtomUI.Labs.Led.Matrix` 的当前实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
 
-第一版公共控件类型固定为 `MatrixDisplay`。第一版只实现单行静态 `5x7` 等宽点阵文本。
+公共控件类型为 `MatrixDisplay`，基础显示为单行 `5x7` 等宽点阵文本，并可选启用 Glow 和单向穿屏 Marquee。
 
 ## 核心链路
 
@@ -243,10 +243,14 @@ Provider 不属于 Matrix MVP 的内部或公开合同。若新增其它真实�
 | `ActiveBrush` | `IBrush?` | `null` | 亮点画刷 |
 | `InactiveBrush` | `IBrush?` | `null` | 暗点画刷 |
 | `ShowInactiveDots` | `bool` | `true` | 是否绘制熄灭点位 |
+| `GlowBrush` | `IBrush?` | `null` | 可选 Glow 画刷；`null` 完全关闭 |
+| `GlowOpacity` | `double` | `0.35` | Glow 透明度，规整到 `0..1` |
+| `GlowRadius` | `double` | `6` | scoped blur 半径 |
+| `IsMarqueeEnabled` | `bool` | `false` | 是否启用单向穿屏 |
+| `MarqueeSpeed` | `double` | `48` | 穿屏速度，单位 DIP/秒 |
+| `MarqueeRepeatDelay` | `TimeSpan` | `500ms` | 两轮穿屏间隔 |
 
-MVP第一版固定圆点。V2以增量合同加入`MatrixDotShape`和`DotCornerRadiusRatio`；仍不公开Glow、Provider、FontSet、`GlyphWidth`或`GlyphHeight`。
-
-后续Glow增量已经落地，新增`GlowBrush`、`GlowOpacity`和`GlowRadius`，默认`GlowBrush=null`，因此不改变基础显示。正式算法、范围和测试结论以[LED Glow技术路线选型](glow-technical-options.md)及[LED Glow原型评估](glow-prototype-evaluation.md)为准；本段中“仍不公开Glow”只描述MVP历史边界，不再代表当前API。
+当前仍不公开 Provider、FontSet、`GlyphWidth`、`GlyphHeight` 或运动策略注入。Glow 技术范围见[LED Glow技术路线选型](glow-technical-options.md)，Marquee 生命周期与运动语义见[LED Matrix Marquee最小契约](matrix-marquee-minimum-contract.md)。
 
 `MatrixOverflowMode` 只包含：
 
@@ -547,7 +551,7 @@ Labs 程序集通过 `https://atomui.net/labs` XML 命名空间公开 `MatrixDis
 
 字模、布局和自动化路径都使用编译期已知类型。Matrix MVP 不引入需要独立释放的 subscription、binding、timer、动态视觉或非 Visual 资源宿主。
 
-真实发布验收使用 Labs Sample 的 Release NativeAOT 配置和专用 `LabsPublishAot` 开关，避免把全局 `PublishAot` 属性传播到 `AtomUI.Generator` Analyzer 项目。`win-x64` NativeAOT 已完成真实 publish；当前剩余 warning 来自 `AtomUI.Core/AppBuilderExtensions.cs` 的既有 Win32 反射配置路径，不来自 Matrix 或 Labs。
+真实发布验收使用 `controlgallery/AtomUILabsGallery.Desktop` 的 Release NativeAOT 配置和专用 `GalleryPublishAot` 开关，避免把全局 `PublishAot` 属性传播到 Analyzer 项目。当前 LED 源码必须保持无 AOT/trim 分析警告；依赖程序集警告应在每次发布结果中单独归因。
 
 ## 性能基线
 
@@ -574,30 +578,30 @@ tools/performances/AtomUI.Labs.Led.Performance
 
 Labs 包必须使用独立标题、描述、标签和 README，明确不保证 Ant Design 视觉一致性，也不要求安装 `AtomUI.Desktop.Controls`。net8/net10 包依赖只允许包含 `AtomUI.Core` 与 Avalonia，不得出现 AtomUI 成型控件包。
 
-## 第一版边界
+## 当前能力边界
 
-以下列表记录已冻结的MVP第一版。V2只增量加入静态DotShape系统，完整合同见[matrix-static-visual-system.md](matrix-static-visual-system.md)。
+以下列表描述当前实现。静态 DotShape 的完整合同见 [matrix-static-visual-system.md](matrix-static-visual-system.md)，Marquee 合同见 [matrix-marquee-minimum-contract.md](matrix-marquee-minimum-contract.md)。
 
-第一版必须完成：
+当前已经实现：
 
 - 单行静态 `5x7` 等宽点阵文本。
 - 固定 45 个字模和未知字符 fallback。
-- 固定圆点、亮暗互斥绘制。
+- Circle、Square、RoundedSquare 三种点形和亮暗互斥绘制。
 - 可配置点尺寸、点间距、字符间距和 Padding。
 - 背景、圆角、亮点画刷、暗点画刷和暗点开关。
 - 水平/垂直内容对齐。
 - `Clip` 和显式 `ScaleDown`。
 - 自绘、测量、实例级 layout 缓存和自动化支持。
-- Shared Token 主题默认值和 Labs sample。
-- 可选的单向穿屏Marquee，最小契约见[LED Matrix Marquee最小契约](matrix-marquee-minimum-contract.md)。
+- Shared Token 主题默认值和 Gallery。
+- 共享 scoped `BlurEffect` Glow。
+- 可选的单向穿屏 Marquee；有效速度为 0 时回退为普通静态显示。
 
-第一版不做：
+当前不支持：
 
 - Provider 接口或自定义字模来源。
 - 多套字模规格或任意分辨率配置。
 - 中文、CJK、复杂脚本和独立小写字形。
-- 方点、圆角方点和点形状切换 API。
-- Glow、扫描线、材质和复杂视觉效果。
+- Glow 材质、扫描线、偏移、质量等级或自定义渲染后端。
 - 除已冻结单向穿屏Marquee之外的滚动模式、闪烁、多行和自动换行。
 - 图片点阵化或硬件 LED 控制。
 - 依赖 AtomUI 成型控件包。
@@ -636,7 +640,7 @@ Labs 包必须使用独立标题、描述、标签和 README，明确不保证 A
 - 非均匀圆角边框在100%、125%、150%、200% RenderScaling下保持单一连通区域，并按四边有效厚度落点。
 - 像素层面的 Clip、ScaleDown、内容对齐和暗点开关。
 
-Labs sample 至少展示：
+Gallery 至少展示：
 
 - 大写字母和小写输入。
 - 数字。

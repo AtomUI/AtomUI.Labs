@@ -1,6 +1,6 @@
 # LED Matrix Marquee 最小契约
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：当前实现契约，更新于 2026-07-20。
 
 ## 领域边界
 
@@ -40,21 +40,21 @@ Matrix静态显示在Marquee关闭时必须独立、完整可用。关闭路径�
 4. 保持离开位置等待`MarqueeRepeatDelay`；
 5. 从右侧外部开始下一轮。
 
-第一轮立即开始，不应用前置延迟。Marquee运行时忽略`HorizontalContentAlignment`，保留`VerticalContentAlignment`；内部按`Clip`语义绘制且不回写`OverflowMode`。空文本、无效视口或有效速度为0时不启动动画。
+第一轮立即开始，不应用前置延迟。Marquee运行时忽略`HorizontalContentAlignment`，保留`VerticalContentAlignment`；内部按`Clip`语义绘制且不回写`OverflowMode`。空文本或无效视口不启动动画；有效速度为0时不启动动画，并按普通静态 `Clip/ScaleDown`、对齐语义渲染。
 
 ## 内部扩展结构
 
 ```text
 MatrixDisplay
     -> LedMarqueeController：Avalonia Animation生命周期和进度
-    -> IMarqueeMotion：无Avalonia绘制依赖的纯运动数学
+    -> LeftThroughMarqueeMotion：无Avalonia绘制依赖的静态纯运动数学
     -> MarqueeRenderPlan：一帧中一个或多个内容放置位置
     -> Matrix可见字符剔除、Geometry和Render
 ```
 
-首版只有`LeftThroughMarqueeMotion`。内部帧计划从第一版起允许多个放置位置，使后续官方连续首尾模式无需重写Matrix渲染组合流程；首版不向开发者开放策略注入，不使用反射、动态发现、DI或插件注册。
+当前只有静态 `LeftThroughMarqueeMotion.Calculate`。在出现第二个真实运动实现前不引入接口；帧计划仍可表达一个或多个放置位置，但不向开发者开放策略注入，也不使用反射、动态发现、DI或插件注册。
 
-动画使用Avalonia Animation驱动内部归一化进度，不使用`DispatcherTimer`，也不按帧累加固定像素。Text、点尺寸、间距、Padding、边框、Bounds、速度或重复间隔变化时取消旧周期并从右侧重新开始。Detach、隐藏、禁用和空文本立即释放动画；重新进入可运行状态后从头开始。
+动画使用Avalonia Animation驱动内部归一化进度，不使用`DispatcherTimer`，也不按帧累加固定像素。Text、点尺寸、间距、Padding、边框、Bounds、速度或重复间隔变化时取消旧周期并从右侧重新开始。Detach、控件自身或任一视觉祖先隐藏、禁用和空文本都会立即释放动画；重新进入可运行状态后从头开始。祖先可见性订阅只在控件已挂载且 `IsMarqueeEnabled=true` 期间存在；关闭 Marquee 或 Detach 时完整解除。
 
 ## 渲染与性能契约
 
@@ -73,13 +73,12 @@ MatrixDisplay
 - Attach、Detach、隐藏、启停、Text/Bounds/参数变化和WeakReference回收。
 - Clip、垂直对齐、Border、Inactive、Glow和不同DPI下的像素边界。
 - 1000与10000字符窄视口保持相同数量级的可见绘制命令。
-- Labs全量测试、Sample Release、真实Windows窗口长稳和win-x64 NativeAOT。
+- Labs全量测试、Gallery Release、真实Windows窗口长稳和win-x64 NativeAOT。
 
 ## 首轮实现验证结果
 
-- Labs全量测试`405/405`通过，包含公共合同、纯运动数学、非法输入、AXAML、渲染位置、长文本视口剔除、600帧缓存稳定和Controller WeakReference释放。
+- 当前测试覆盖公共合同、纯运动数学、非法输入、AXAML、渲染位置、长文本视口剔除、600帧缓存稳定、父级有效可见性和Controller WeakReference释放；精确数量以本仓库最新 `dotnet test` 结果为准。
 - 100与10000字符在相同窄视口和中段进度下提交相同数量级的可见字模命令，不随完整文本长度线性增长。
 - `net8.0`与`net10.0` Release双目标构建通过，0 warning、0 error。
-- Sample Release构建通过；普通Win32产物和NativeAOT产物分别持续运行15秒，均未提前退出，关闭路径无异常。
-- win-x64 NativeAOT发布成功。警告仍来自`AtomUI.Core/AppBuilderExtensions.cs`既有Win32反射配置，不来自Labs或Marquee。
+- Gallery Release 和 win-x64 NativeAOT 是当前发布验收入口；发布警告必须区分 LED 源码与依赖程序集。
 - Headless后端不会随墙钟等待自动推进Avalonia渲染动画时钟，因此自动测试使用确定性的进度注入验证各位置Render；真实时钟运动由Win32 Smoke和最终人工视觉验收负责。
