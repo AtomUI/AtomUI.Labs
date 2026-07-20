@@ -1,0 +1,141 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:gallery="https://atomui.net/oss-controls/gallery"
+             xmlns:labs="https://atomui.net/labs"
+             xmlns:led="using:AtomUILabsGallery.ShowCases.Led"
+             x:Class="AtomUILabsGallery.ShowCases.Led.LedSegmentShowCase"
+             x:DataType="led:LedSegmentViewModel">
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
+        <gallery:GalleryStickyTabsHost>
+            <gallery:GalleryStickyTabsHost.Header>
+                <gallery:GalleryShowCaseHeader Title="LED Segment"
+                                               Category="Data Display"
+                                               Status="Experimental"
+                                               Subtitle="Fourteen-segment LED-style text display."
+                                               Description="Displays numbers, Latin letters and common symbols with configurable segment geometry, layout, glow and inactive segments."
+                                               Namespace="AtomUI.Labs.Led.Segment"
+                                               Package="AtomUI.Labs.Led"
+                                               BaseClass="Control" />
+            </gallery:GalleryStickyTabsHost.Header>
+
+            <gallery:ShowCasePanel Name="ExamplesContent"
+                                   ContentMargin="28,10,28,28"
+                                   IsScrollEnabled="False"
+                                   IsDeferredLoadingEnabled="True"
+                                   InitialDeferredLoadItemCount="4"
+                                   DeferredLoadBatchSize="2"
+                                   MaxColumns="1">
+                <gallery:ShowCaseItem Title="Basic and symbols"
+                                      Description="Default theme values, letters, numbers, colon, decimal point and minus sign."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedSegmentViewModel">
+                            <StackPanel Spacing="12">
+                                <labs:SegmentDisplay Text="12:45"
+                                                     CharacterHeight="70"
+                                                     SegmentThickness="7"
+                                                     SegmentGap="3"
+                                                     CharacterSpacing="9" />
+                                <labs:SegmentDisplay Text="A-01.5"
+                                                     CharacterHeight="64"
+                                                     SegmentThickness="7"
+                                                     SegmentGap="2"
+                                                     Padding="16"
+                                                     Background="#121218"
+                                                     ActiveBrush="#FF4E4E"
+                                                     InactiveBrush="#26FF4E4E"
+                                                     CornerRadius="10" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Shape and inactive segments"
+                                      Description="Tune bevel, thickness, gap and dot scale without changing the character mapping."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedSegmentViewModel">
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <labs:SegmentDisplay Text="3.14"
+                                                     CharacterHeight="72"
+                                                     SegmentThickness="10"
+                                                     SegmentGap="2"
+                                                     SegmentBevelRatio="0.15"
+                                                     DotScale="0.48"
+                                                     Padding="18"
+                                                     Background="#121416"
+                                                     ActiveBrush="#B7FF67"
+                                                     InactiveBrush="#24B7FF67"
+                                                     CornerRadius="10" />
+                                <labs:SegmentDisplay Grid.Column="1"
+                                                     Text="CLEAN"
+                                                     CharacterHeight="58"
+                                                     SegmentThickness="7"
+                                                     SegmentGap="2"
+                                                     ShowInactiveSegments="False"
+                                                     Padding="18"
+                                                     Background="#101419"
+                                                     ActiveBrush="#68DDFF"
+                                                     CornerRadius="10" />
+                            </Grid>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Alignment and overflow"
+                                      Description="Content can align inside a larger panel, clip, or explicitly scale down in constrained space."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedSegmentViewModel">
+                            <StackPanel Spacing="12">
+                                <labs:SegmentDisplay Text="CENTER"
+                                                     Height="140"
+                                                     CharacterHeight="64"
+                                                     HorizontalContentAlignment="Center"
+                                                     VerticalContentAlignment="Center"
+                                                     Padding="16"
+                                                     Background="#0C1217"
+                                                     ActiveBrush="#67F2A3"
+                                                     InactiveBrush="#2267F2A3"
+                                                     CornerRadius="10" />
+                                <labs:SegmentDisplay Text="1234567890"
+                                                     Width="300"
+                                                     Height="72"
+                                                     CharacterHeight="72"
+                                                     OverflowMode="ScaleDown"
+                                                     HorizontalContentAlignment="Center"
+                                                     VerticalContentAlignment="Center"
+                                                     Padding="12"
+                                                     Background="#18100C"
+                                                     ActiveBrush="#FF8E5B"
+                                                     InactiveBrush="#22FF8E5B"
+                                                     CornerRadius="8" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Glow workbench"
+                                      Description="Compare Matrix and Segment glow brush, opacity, radius and animation modes."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedSegmentViewModel">
+                            <led:LedGlowWorkbench />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Dynamic values"
+                                      Description="A clock and fixed-topology counters exercise the layout and geometry caches."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="led:LedSegmentViewModel">
+                            <led:LedDynamicDisplays />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+            </gallery:ShowCasePanel>
+        </gallery:GalleryStickyTabsHost>
+    </Grid>
+</UserControl>
