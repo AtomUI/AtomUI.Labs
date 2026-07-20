@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="AtomUI.Labs.Led.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
         <AssemblyMetadata Include="AtomUIVersion" Value="$(AtomUIVersion)"/>
         <AssemblyMetadata Include="AtomUILabsVersion" Value="$(AtomUILabsVersion)"/>
     </ItemGroup>

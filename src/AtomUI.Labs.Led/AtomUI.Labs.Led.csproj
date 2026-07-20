@@ -2,7 +2,7 @@
     <PropertyGroup>
         <TargetFrameworks>$(AtomUITargetFrameworks)</TargetFrameworks>
         <RootNamespace>AtomUI.Labs.Led</RootNamespace>
-        <Title>AtomUI Labs Led Controls</Title>
+        <Title>AtomUI Labs LED Controls</Title>
         <Description>Experimental LED-style segment and matrix display controls for AtomUI applications.</Description>
         <PackageTags>avalonia;AtomUI;Labs;LED;Segment Display;Matrix Display;Desktop;Experimental</PackageTags>
     </PropertyGroup>
