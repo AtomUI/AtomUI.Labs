@@ -1,15 +1,15 @@
 # LED 控件家族设计
 
-> 文档状态：已实现。本文于 2026-07-20 随 LED 控件从 AtomUI 迁入 AtomUI.Labs，并已按本仓库的包名、目录和验证入口完成适配。历史性能数值仍表示迁移时的基线，后续变更应在本仓库重新验证。
+> 文档状态：当前架构与公共契约，更新于 2026-07-20。历史审计、原型和性能数据在导航中单独标识，不作为当前实现事实。
 
 本文记录 `AtomUI.Labs.Led` 的组件域设计。LED 是 Labs 下的实验控件家族名，不是单一控件名。
 
 ## 文档导航
 
 - Segment：[实现原理](segment-implementation.md)、[性能回归矩阵](segment-performance-regression.md)。
-- Matrix：[实现原理](matrix-implementation.md)、[静态视觉系统](matrix-static-visual-system.md)、[Marquee 最小契约](matrix-marquee-minimum-contract.md)、[MVP 收口审计](matrix-mvp-audit.md)。
-- Matrix 性能：[逐点基线](matrix-performance-baseline.md)、[几何批处理](matrix-performance-geometry-batch.md)、[动态负载](matrix-performance-dynamic-load.md)、[分配与长稳](matrix-performance-allocation-and-soak.md)。
-- 家族增强与边界：[公共边界审计](family-common-boundary-audit.md)、[Glow 技术选型](glow-technical-options.md)、[Glow 原型评估](glow-prototype-evaluation.md)。
+- Matrix：[实现原理](matrix-implementation.md)、[Marquee 最小契约](matrix-marquee-minimum-contract.md)；[静态视觉系统](matrix-static-visual-system.md)和[MVP 收口审计](matrix-mvp-audit.md)是历史设计/审计记录。
+- Matrix 历史性能证据：[逐点基线](matrix-performance-baseline.md)、[几何批处理](matrix-performance-geometry-batch.md)、[动态负载](matrix-performance-dynamic-load.md)、[分配与长稳](matrix-performance-allocation-and-soak.md)。
+- 家族增强与边界：[Glow 技术选型](glow-technical-options.md)记录当前技术决议；[公共边界审计](family-common-boundary-audit.md)和[Glow 原型评估](glow-prototype-evaluation.md)是历史证据。
 
 ## 定位
 
@@ -99,9 +99,8 @@ Text
 
 Matrix 需要额外考虑：
 
-- 第一版固定 `5x7` 字模规格，不开放任意行列配置。
-- 第一版固定圆点，不开放点形状切换。
-- 第二阶段在相同点位外接框内增加Circle、Square和RoundedSquare静态轮廓，不改变字模和布局。
+- 当前固定 `5x7` 字模规格，不开放任意行列配置。
+- 当前在相同点位外接框内支持 Circle、Square 和 RoundedSquare 静态轮廓，不改变字模和布局。
 - 点尺寸、点间距、字符间距、Padding 和内容对齐。
 - 小空间下的裁剪和显式等比缩小。
 
@@ -194,11 +193,11 @@ LED 家族不得使用 AtomUI 已经成型的控件包：
 
 ## 非目标
 
-第一阶段不处理：
+当前不处理：
 
 - 真实硬件 LED 控制。
 - 中文、复杂脚本或富文本排版。
-- 动态滚动、闪烁、故障动画等效果。
+- Segment 内建动画，以及 Matrix 单向穿屏之外的滚动、闪烁或故障动画。
 - 把 `Segment` 和 `Matrix` 合并为一个万能控件。
 - 提前固定 LED 家族公共代码目录名。
 
@@ -207,14 +206,24 @@ LED 家族不得使用 AtomUI 已经成型的控件包：
 实现阶段至少需要验证：
 
 - Labs 项目构建通过。
-- Labs Sample 构建通过。
+- `controlgallery/AtomUILabsGallery.Desktop` 构建和 `win-x64` NativeAOT 发布通过。
 - 搜索确认 LED 家族没有引用 AtomUI 成型控件包。
-- Sample 能展示 Segment 和 Matrix 的基础视觉。
+- Gallery 能展示 Segment、Matrix、Glow 和 Marquee 的基础视觉与交互。
 - `git diff --check` 通过。
+
+## 当前契约追踪
+
+| 契约 | 主要源码 | 主要自动化验证 |
+|---|---|---|
+| Segment 理想尺寸、对齐、Clip/ScaleDown | `Segment/Layout/SegmentLayoutEngine.cs`、`SegmentDisplay.cs` | `SegmentLayoutEngineTests`、`SegmentDisplayMeasureTests`、`SegmentDisplayRenderTests` |
+| Segment 数值、圆角和主题鲁棒性 | `SegmentValueSanitizer.cs`、`SegmentDisplayTheme.axaml` | `SegmentDisplayRenderTests`、`SegmentDisplayThemeTests` |
+| Matrix 字模、点形、边框和主题 | `MatrixDisplay.cs`、`Matrix/Character/`、`Matrix/Rendering/` | `MatrixDisplay*Tests`、`MatrixGlyph*Tests` |
+| Glow scoped blur 与 Effect 复用 | `Glow/LedGlowRenderer.cs`、两个 Display 的 Render 路径 | `LedGlow*Tests`、Segment/Matrix Render 与正式性能测试 |
+| Marquee 运动、静态回退与生命周期 | `Marquee/`、`MatrixDisplay.cs` | `MatrixMarqueeMotionTests`、`MatrixMarqueeLifecycleTests`、`MatrixDisplayRenderTests` |
 
 ## 相关设计
 
 - [LED 家族公共边界审计](family-common-boundary-audit.md)：记录 Segment 与 Matrix 之间已验证的共享边界。
-- [LED Glow 技术路线选型](glow-technical-options.md)：记录多层矢量扩张、Alpha Mask模糊和Avalonia/Skia Effect三条候选路线。
+- [LED Glow 当前技术合同](glow-technical-options.md)：记录正式 scoped BlurEffect 路线的公共属性、绘制和性能契约。
 - [LED Glow 原型评估](glow-prototype-evaluation.md)：记录候选路线、正式控件接入和性能门禁的历史验证。
 - [LED Matrix Marquee最小契约](matrix-marquee-minimum-contract.md)：记录单向穿屏公共契约、动态增强边界和后续官方运动模式的内部扩展结构。

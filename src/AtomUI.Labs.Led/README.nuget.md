@@ -1,4 +1,4 @@
-## AtomUI Labs Led
+## AtomUI Labs LED
 
 `AtomUI.Labs.Led` provides experimental LED-style display controls for AtomUI applications:
 
