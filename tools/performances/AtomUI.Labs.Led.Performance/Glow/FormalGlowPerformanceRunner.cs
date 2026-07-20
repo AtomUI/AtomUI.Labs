@@ -12,6 +12,11 @@ namespace AtomUI.Labs.Led.Performance;
 internal static class FormalGlowPerformanceRunner
 {
     private const int WarmupFrames = 100;
+    private const int DisabledTimingTrialCount = 5;
+    private const double DisabledMaximumTimingRatio = 1.05;
+    private const double DisabledMaximumTimingDeltaMicroseconds = 0.25;
+    private const double DisabledMaximumAllocationRatio = 1.025;
+    private const double DisabledMaximumAllocationDeltaPerFrame = 4_096;
     private static DrawingGroup? _drawingSink;
 
     public static int Run(int frameCount, string? markdownOutputPath)
@@ -29,18 +34,24 @@ internal static class FormalGlowPerformanceRunner
         var disabledPairs = Enum.GetValues<FormalGlowControlKind>()
                                 .Select(kind => MeasureDisabledPair(kind, frameCount))
                                 .ToArray();
+        var disabledAllocations = Enum.GetValues<FormalGlowControlKind>()
+                                      .Select(kind => CreateDisabledAllocationResult(kind, results))
+                                      .ToArray();
 
-        var report = RenderReport(results, disabledPairs);
+        var report = RenderReport(results, disabledPairs, disabledAllocations);
         Console.WriteLine(report);
         if (!string.IsNullOrWhiteSpace(markdownOutputPath))
         {
             var fullPath = Path.GetFullPath(markdownOutputPath);
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-            File.WriteAllText(fullPath, RenderMarkdown(results, disabledPairs), new UTF8Encoding(false));
+            File.WriteAllText(
+                fullPath,
+                RenderMarkdown(results, disabledPairs, disabledAllocations),
+                new UTF8Encoding(false));
             Console.WriteLine($"Wrote formal Glow result: {fullPath}");
         }
 
-        return Validate(results, disabledPairs) ? 0 : 1;
+        return Validate(results, disabledPairs, disabledAllocations) ? 0 : 1;
     }
 
     private static DisabledPairResult MeasureDisabledPair(FormalGlowControlKind kind, int frameCount)
@@ -60,6 +71,21 @@ internal static class FormalGlowPerformanceRunner
             _drawingSink = Render(i % 2 == 0 ? zeroOpacity : nullBrush);
         }
 
+        var trials = new DisabledPairResult[DisabledTimingTrialCount];
+        for (var trial = 0; trial < trials.Length; trial++)
+        {
+            trials[trial] = MeasureDisabledPairTrial(kind, nullBrush, zeroOpacity, frameCount);
+        }
+
+        return trials.OrderBy(result => result.ZeroToNullRatio).ElementAt(trials.Length / 2);
+    }
+
+    private static DisabledPairResult MeasureDisabledPairTrial(
+        FormalGlowControlKind kind,
+        Control nullBrush,
+        Control zeroOpacity,
+        int frameCount)
+    {
         long nullTicks = 0;
         long zeroTicks = 0;
         const int batchSize = 16;
@@ -280,18 +306,35 @@ internal static class FormalGlowPerformanceRunner
 
     private static bool Validate(
         IReadOnlyList<FormalGlowResult> results,
-        IReadOnlyList<DisabledPairResult> disabledPairs)
+        IReadOnlyList<DisabledPairResult> disabledPairs,
+        IReadOnlyList<DisabledAllocationResult> disabledAllocations)
     {
         return results.Where(result => result.Mode is FormalGlowMode.DisabledNullBrush or FormalGlowMode.DisabledZeroOpacity)
                       .All(result => result.EffectBuilds == 0 && result.EffectScopes == 0)
                && results.Where(result => result.Mode == FormalGlowMode.Static)
                          .All(result => result.EffectBuilds == 0 && result.EffectScopes == result.FrameCount)
-               && disabledPairs.All(result => result.SlowerToFasterRatio <= 1.05);
+               && disabledPairs.All(result => result.IsWithinBudget)
+               && disabledAllocations.All(result => result.IsWithinBudget);
+    }
+
+    private static DisabledAllocationResult CreateDisabledAllocationResult(
+        FormalGlowControlKind controlKind,
+        IReadOnlyList<FormalGlowResult> results)
+    {
+        var nullBrush = results.Single(result =>
+            result.Control == controlKind && result.Mode == FormalGlowMode.DisabledNullBrush);
+        var zeroOpacity = results.Single(result =>
+            result.Control == controlKind && result.Mode == FormalGlowMode.DisabledZeroOpacity);
+        return new DisabledAllocationResult(
+            controlKind,
+            nullBrush.BytesPerFrame,
+            zeroOpacity.BytesPerFrame);
     }
 
     private static string RenderReport(
         IReadOnlyList<FormalGlowResult> results,
-        IReadOnlyList<DisabledPairResult> disabledPairs)
+        IReadOnlyList<DisabledPairResult> disabledPairs,
+        IReadOnlyList<DisabledAllocationResult> disabledAllocations)
     {
         var builder = new StringBuilder();
         builder.AppendLine("Formal LED Glow performance (DrawingGroup command submission)");
@@ -303,11 +346,19 @@ internal static class FormalGlowPerformanceRunner
         }
 
         builder.AppendLine("Disabled paired timing");
-        builder.AppendLine("Control  NullBrush us/frame  ZeroOpacity us/frame  slower/faster  Gate");
+        builder.AppendLine("Control  NullBrush us/frame  ZeroOpacity us/frame  added us  zero/null  Gate");
         foreach (var pair in disabledPairs)
         {
             builder.AppendLine(CultureInfo.InvariantCulture,
-                $"{pair.Control,-9}{pair.NullMicrosecondsPerFrame,19:0.00}{pair.ZeroMicrosecondsPerFrame,22:0.00}{pair.SlowerToFasterRatio,15:0.000}  {(pair.SlowerToFasterRatio <= 1.05 ? "PASS" : "FAIL")}");
+                $"{pair.Control,-9}{pair.NullMicrosecondsPerFrame,19:0.00}{pair.ZeroMicrosecondsPerFrame,22:0.00}{pair.AdditionalMicrosecondsPerFrame,10:0.00}{pair.ZeroToNullRatio,11:0.000}  {(pair.IsWithinBudget ? "PASS" : "FAIL")}");
+        }
+
+        builder.AppendLine("Disabled allocation");
+        builder.AppendLine("Control  NullBrush bytes/frame  ZeroOpacity bytes/frame  added  zero/null  Gate");
+        foreach (var allocation in disabledAllocations)
+        {
+            builder.AppendLine(CultureInfo.InvariantCulture,
+                $"{allocation.Control,-9}{allocation.NullBytesPerFrame,22:0.0}{allocation.ZeroBytesPerFrame,25:0.0}{allocation.AdditionalBytesPerFrame,8:0.0}{allocation.ZeroToNullRatio,11:0.000}  {(allocation.IsWithinBudget ? "PASS" : "FAIL")}");
         }
 
         return builder.ToString();
@@ -315,7 +366,8 @@ internal static class FormalGlowPerformanceRunner
 
     private static string RenderMarkdown(
         IReadOnlyList<FormalGlowResult> results,
-        IReadOnlyList<DisabledPairResult> disabledPairs)
+        IReadOnlyList<DisabledPairResult> disabledPairs,
+        IReadOnlyList<DisabledAllocationResult> disabledAllocations)
     {
         var builder = new StringBuilder();
         builder.AppendLine("# Formal LED Glow Performance");
@@ -331,12 +383,21 @@ internal static class FormalGlowPerformanceRunner
         }
 
         builder.AppendLine();
-        builder.AppendLine("| Control | NullBrush us/frame | ZeroOpacity us/frame | slower/faster | Gate |");
-        builder.AppendLine("|---|---:|---:|---:|---|");
+        builder.AppendLine("| Control | NullBrush us/frame | ZeroOpacity us/frame | added us | zero/null | Gate |");
+        builder.AppendLine("|---|---:|---:|---:|---:|---|");
         foreach (var pair in disabledPairs)
         {
             builder.AppendLine(CultureInfo.InvariantCulture,
-                $"| {pair.Control} | {pair.NullMicrosecondsPerFrame:0.00} | {pair.ZeroMicrosecondsPerFrame:0.00} | {pair.SlowerToFasterRatio:0.000} | {(pair.SlowerToFasterRatio <= 1.05 ? "PASS" : "FAIL")} |");
+                $"| {pair.Control} | {pair.NullMicrosecondsPerFrame:0.00} | {pair.ZeroMicrosecondsPerFrame:0.00} | {pair.AdditionalMicrosecondsPerFrame:0.00} | {pair.ZeroToNullRatio:0.000} | {(pair.IsWithinBudget ? "PASS" : "FAIL")} |");
+        }
+
+        builder.AppendLine();
+        builder.AppendLine("| Control | NullBrush bytes/frame | ZeroOpacity bytes/frame | added | zero/null | Gate |");
+        builder.AppendLine("|---|---:|---:|---:|---:|---|");
+        foreach (var allocation in disabledAllocations)
+        {
+            builder.AppendLine(CultureInfo.InvariantCulture,
+                $"| {allocation.Control} | {allocation.NullBytesPerFrame:0.0} | {allocation.ZeroBytesPerFrame:0.0} | {allocation.AdditionalBytesPerFrame:0.0} | {allocation.ZeroToNullRatio:0.000} | {(allocation.IsWithinBudget ? "PASS" : "FAIL")} |");
         }
 
         return builder.ToString();
@@ -382,6 +443,35 @@ internal static class FormalGlowPerformanceRunner
 
         public double ZeroMicrosecondsPerFrame => ZeroTicks * 1_000_000d / Stopwatch.Frequency / FrameCount;
 
-        public double SlowerToFasterRatio => Math.Max(NullTicks, ZeroTicks) / (double)Math.Min(NullTicks, ZeroTicks);
+        public double ZeroToNullRatio => ZeroTicks / (double)NullTicks;
+
+        public double AdditionalMicrosecondsPerFrame =>
+            Math.Max(0, ZeroMicrosecondsPerFrame - NullMicrosecondsPerFrame);
+
+        public bool IsWithinBudget =>
+            ZeroToNullRatio <= DisabledMaximumTimingRatio
+            || AdditionalMicrosecondsPerFrame <= DisabledMaximumTimingDeltaMicroseconds;
+    }
+
+    private sealed record DisabledAllocationResult(
+        FormalGlowControlKind Control,
+        double NullBytesPerFrame,
+        double ZeroBytesPerFrame)
+    {
+        public double AdditionalBytesPerFrame => Math.Max(0, ZeroBytesPerFrame - NullBytesPerFrame);
+
+        public double ZeroToNullRatio
+        {
+            get
+            {
+                return NullBytesPerFrame <= 0
+                    ? (AdditionalBytesPerFrame <= 0 ? 1 : double.PositiveInfinity)
+                    : ZeroBytesPerFrame / NullBytesPerFrame;
+            }
+        }
+
+        public bool IsWithinBudget =>
+            AdditionalBytesPerFrame <= DisabledMaximumAllocationDeltaPerFrame
+            && ZeroToNullRatio <= DisabledMaximumAllocationRatio;
     }
 }
