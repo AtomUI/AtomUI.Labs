@@ -17,8 +17,11 @@ tests/<PackageName>.Tests/
 controlgallery/AtomUILabsGallery/
 controlgallery/AtomUILabsGallery.Desktop/
 docs/architecture/
+docs/controls/<ControlName>/
 docs/engineering/
 ```
+
+长期维护的控件设计、实现约束和验证资料放在 `docs/controls/<ControlName>/`，并以 `overview.md` 作为专题入口。文档先于源码迁入时，必须明确标注目标设计与历史参考实现的边界。
 
 新增控件时，优先使用包名和项目名：
 

@@ -45,6 +45,8 @@ git diff --check
 
 - [工程规范总览](docs/engineering/overview.md)
 - [构建、打包与发布](docs/architecture/build-and-packaging.md)
+- [实验控件文档](docs/controls/overview.md)
+- [LED 控件家族](docs/controls/led/overview.md)
 - [全局工程规范](docs/global-engineering-guidelines.md)
 
 ## 状态说明

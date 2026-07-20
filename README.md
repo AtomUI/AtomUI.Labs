@@ -45,6 +45,8 @@ Package artifacts are written to `output/Nuget/<Configuration>`.
 
 - [Engineering overview](docs/engineering/overview.md)
 - [Build and packaging](docs/architecture/build-and-packaging.md)
+- [Experimental controls](docs/controls/overview.md)
+- [LED control family](docs/controls/led/overview.md)
 - [Global engineering guidelines](docs/global-engineering-guidelines.md)
 
 ## Status

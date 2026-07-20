@@ -15,3 +15,7 @@
 
 - 工程规范总览：[docs/engineering/overview.md](engineering/overview.md)
 - 构建、打包与发布：[docs/architecture/build-and-packaging.md](architecture/build-and-packaging.md)
+
+## 按需阅读
+
+- 实验控件文档入口：[docs/controls/overview.md](controls/overview.md)
