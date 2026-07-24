@@ -117,7 +117,7 @@
                 </gallery:ShowCaseItem>
 
                 <gallery:ShowCaseItem Title="Glow workbench"
-                                      Description="Compare Matrix and Segment glow brush, opacity, radius and animation modes."
+                                      Description="Adjust state, preset or hexadecimal brush, opacity, radius and animation mode while comparing Matrix and Segment glow in real time."
                                       IsDeferredContentEnabled="True">
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedSegmentViewModel">

@@ -9,6 +9,11 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
+using AtomComboBox = AtomUI.Desktop.Controls.ComboBox;
+using AtomSegmented = AtomUI.Desktop.Controls.Segmented;
+using AtomSlider = AtomUI.Desktop.Controls.Slider;
+using AtomTextBox = AtomUI.Desktop.Controls.TextBox;
+using AtomToggleSwitch = AtomUI.Desktop.Controls.ToggleSwitch;
 
 namespace AtomUILabsGallery.ShowCases.Led;
 
@@ -25,17 +30,27 @@ public sealed class LedGlowWorkbench : StackPanel
 
     private readonly MatrixDisplay _matrix;
     private readonly SegmentDisplay _segment;
-    private readonly CheckBox _enabled;
-    private readonly ComboBox _brush;
-    private readonly ComboBox _mode;
-    private readonly Slider _opacity;
-    private readonly Slider _radius;
+    private readonly AtomToggleSwitch _enabled;
+    private readonly AtomComboBox _brushPreset;
+    private readonly AtomTextBox _brushHex;
+    private readonly TextBlock _brushValidation;
+    private readonly AtomSegmented _mode;
+    private readonly AtomSlider _opacity;
+    private readonly AtomSlider _radius;
     private readonly TextBlock _opacityValue;
     private readonly TextBlock _radiusValue;
     private CancellationTokenSource? _animationCancellation;
+    private Color _selectedBrushColor = BrushOptions[0].Color;
+    private bool _isSynchronizingBrushEditor;
     private bool _isAttachedToVisualTree;
 
     internal bool HasActiveAnimation => _animationCancellation is { IsCancellationRequested: false };
+
+    internal bool GlowEnabled
+    {
+        get => _enabled.IsChecked == true;
+        set => _enabled.IsChecked = value;
+    }
 
     internal int AnimationModeIndex
     {
@@ -43,39 +58,96 @@ public sealed class LedGlowWorkbench : StackPanel
         set => _mode.SelectedIndex = value;
     }
 
+    internal int BrushPresetIndex
+    {
+        get => _brushPreset.SelectedIndex;
+        set => _brushPreset.SelectedIndex = value;
+    }
+
+    internal string? BrushHexText
+    {
+        get => _brushHex.Text;
+        set => _brushHex.Text = value;
+    }
+
+    internal bool HasBrushValidationError => _brushValidation.IsVisible;
+
+    internal double GlowOpacity
+    {
+        get => _opacity.Value;
+        set => _opacity.Value = value;
+    }
+
+    internal double GlowRadius
+    {
+        get => _radius.Value;
+        set => _radius.Value = value;
+    }
+
+    internal IBrush? MatrixGlowBrush => _matrix.GlowBrush;
+
+    internal IBrush? SegmentGlowBrush => _segment.GlowBrush;
+
+    internal double MatrixGlowOpacity => _matrix.GlowOpacity;
+
+    internal double SegmentGlowOpacity => _segment.GlowOpacity;
+
+    internal double MatrixGlowRadius => _matrix.GlowRadius;
+
+    internal double SegmentGlowRadius => _segment.GlowRadius;
+
     public LedGlowWorkbench()
     {
         Spacing = 12;
         _matrix = CreateMatrixPreview();
         _segment = CreateSegmentPreview();
-        _enabled = new CheckBox { Content = "Enabled", IsChecked = true };
-        _brush = new ComboBox
+        _enabled = new AtomToggleSwitch
+        {
+            OnContent = "Enabled",
+            OffContent = "Disabled",
+            IsChecked = true
+        };
+        _brushPreset = new AtomComboBox
         {
             ItemsSource = BrushOptions.Select(option => option.Name).ToArray(),
             SelectedIndex = 0,
-            MinWidth = 130
+            Width = 150
         };
-        _mode = new ComboBox
+        _brushHex = new AtomTextBox
+        {
+            Text = FormatHexColor(_selectedBrushColor),
+            PlaceholderText = "#RRGGBB",
+            Width = 140
+        };
+        _brushValidation = new TextBlock
+        {
+            Text = "Use #RRGGBB or #AARRGGBB.",
+            Foreground = Brushes.OrangeRed,
+            IsVisible = false
+        };
+        _mode = new AtomSegmented
         {
             ItemsSource = new[] { "Static", "Breathe", "Pulse" },
             SelectedIndex = 0,
-            MinWidth = 130
+            MinWidth = 300,
+            IsExpanding = true,
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
-        _opacity = new Slider
+        _opacity = new AtomSlider
         {
             Minimum = 0,
             Maximum = 1,
             Value = 0.35,
             TickFrequency = 0.05,
-            Width = 220
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
-        _radius = new Slider
+        _radius = new AtomSlider
         {
             Minimum = 0,
             Maximum = 24,
             Value = 6,
             TickFrequency = 1,
-            Width = 220
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
         _opacityValue = new TextBlock { Width = 48, VerticalAlignment = VerticalAlignment.Center };
         _radiusValue = new TextBlock { Width = 48, VerticalAlignment = VerticalAlignment.Center };
@@ -86,19 +158,7 @@ public sealed class LedGlowWorkbench : StackPanel
             FontSize = 18,
             FontWeight = FontWeight.SemiBold
         });
-        Children.Add(new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Spacing = 16,
-            Children =
-            {
-                CreateLabeledControl("State", _enabled),
-                CreateLabeledControl("Brush", _brush),
-                CreateLabeledControl("Mode", _mode)
-            }
-        });
-        Children.Add(CreateSliderRow("Opacity", _opacity, _opacityValue));
-        Children.Add(CreateSliderRow("Radius", _radius, _radiusValue));
+        Children.Add(CreateConfigurationPanel());
         Children.Add(new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,*"),
@@ -111,13 +171,86 @@ public sealed class LedGlowWorkbench : StackPanel
         });
 
         _enabled.IsCheckedChanged += HandleConfigurationChanged;
-        _brush.SelectionChanged += HandleConfigurationChanged;
+        _brushPreset.SelectionChanged += HandleBrushPresetChanged;
+        _brushHex.PropertyChanged += HandleBrushHexPropertyChanged;
         _mode.SelectionChanged += HandleConfigurationChanged;
         _opacity.PropertyChanged += HandleSliderPropertyChanged;
         _radius.PropertyChanged += HandleSliderPropertyChanged;
         AttachedToVisualTree += HandleAttachedToVisualTree;
         DetachedFromVisualTree += HandleDetachedFromVisualTree;
         ApplyConfiguration();
+    }
+
+    private Control CreateBrushEditor()
+    {
+        return new StackPanel
+        {
+            Spacing = 4,
+            Children =
+            {
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 8,
+                    Children =
+                    {
+                        _brushPreset,
+                        _brushHex
+                    }
+                },
+                _brushValidation
+            }
+        };
+    }
+
+    private Control CreateConfigurationPanel()
+    {
+        var panel = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("72,*,56"),
+            RowDefinitions = new RowDefinitions("Auto,Auto,Auto,Auto,Auto"),
+            ColumnSpacing = 12,
+            RowSpacing = 12,
+            MaxWidth = 620,
+            HorizontalAlignment = HorizontalAlignment.Left
+        };
+
+        AddConfigurationRow(panel, 0, "State", _enabled);
+        AddConfigurationRow(panel, 1, "Brush", CreateBrushEditor());
+        AddConfigurationRow(panel, 2, "Mode", _mode);
+        AddConfigurationRow(panel, 3, "Opacity", _opacity, _opacityValue);
+        AddConfigurationRow(panel, 4, "Radius", _radius, _radiusValue);
+        return panel;
+    }
+
+    private static void AddConfigurationRow(
+        Grid panel,
+        int row,
+        string label,
+        Control control,
+        Control? value = null)
+    {
+        var labelBlock = new TextBlock
+        {
+            Text = label,
+            FontWeight = FontWeight.SemiBold,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        Grid.SetRow(labelBlock, row);
+        panel.Children.Add(labelBlock);
+
+        Grid.SetRow(control, row);
+        Grid.SetColumn(control, 1);
+        panel.Children.Add(control);
+
+        if (value is null)
+        {
+            return;
+        }
+
+        Grid.SetRow(value, row);
+        Grid.SetColumn(value, 2);
+        panel.Children.Add(value);
     }
 
     private void HandleAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
@@ -134,6 +267,58 @@ public sealed class LedGlowWorkbench : StackPanel
 
     private void HandleConfigurationChanged(object? sender, EventArgs e)
     {
+        ApplyConfiguration();
+    }
+
+    private void HandleBrushPresetChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isSynchronizingBrushEditor ||
+            _brushPreset.SelectedIndex < 0 ||
+            _brushPreset.SelectedIndex >= BrushOptions.Length)
+        {
+            return;
+        }
+
+        _selectedBrushColor = BrushOptions[_brushPreset.SelectedIndex].Color;
+        _isSynchronizingBrushEditor = true;
+        try
+        {
+            _brushHex.Text = FormatHexColor(_selectedBrushColor);
+        }
+        finally
+        {
+            _isSynchronizingBrushEditor = false;
+        }
+
+        SetBrushValidationError(false);
+        ApplyConfiguration();
+    }
+
+    private void HandleBrushHexPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (_isSynchronizingBrushEditor || e.Property != AtomTextBox.TextProperty)
+        {
+            return;
+        }
+
+        if (!TryParseHexColor(_brushHex.Text, out var color))
+        {
+            SetBrushValidationError(true);
+            return;
+        }
+
+        _selectedBrushColor = color;
+        _isSynchronizingBrushEditor = true;
+        try
+        {
+            _brushPreset.SelectedIndex = FindBrushPresetIndex(color);
+        }
+        finally
+        {
+            _isSynchronizingBrushEditor = false;
+        }
+
+        SetBrushValidationError(false);
         ApplyConfiguration();
     }
 
@@ -282,41 +467,79 @@ public sealed class LedGlowWorkbench : StackPanel
 
     private IBrush CreateSelectedBrush()
     {
-        var index = Math.Clamp(_brush.SelectedIndex, 0, BrushOptions.Length - 1);
-        return new SolidColorBrush(BrushOptions[index].Color);
+        return new SolidColorBrush(_selectedBrushColor);
     }
 
-    private static Control CreateLabeledControl(string label, Control control)
+    private void SetBrushValidationError(bool hasError)
     {
-        return new StackPanel
-        {
-            Spacing = 4,
-            Children =
-            {
-                new TextBlock { Text = label, FontWeight = FontWeight.SemiBold },
-                control
-            }
-        };
+        _brushValidation.IsVisible = hasError;
     }
 
-    private static Control CreateSliderRow(string label, Slider slider, TextBlock value)
+    private static int FindBrushPresetIndex(Color color)
     {
-        return new StackPanel
+        for (var index = 0; index < BrushOptions.Length; index++)
         {
-            Orientation = Orientation.Horizontal,
-            Spacing = 10,
-            Children =
+            if (BrushOptions[index].Color == color)
             {
-                new TextBlock
-                {
-                    Text = label,
-                    Width = 64,
-                    VerticalAlignment = VerticalAlignment.Center
-                },
-                slider,
-                value
+                return index;
             }
-        };
+        }
+
+        return -1;
+    }
+
+    private static string FormatHexColor(Color color)
+    {
+        return color.A == byte.MaxValue
+            ? $"#{color.R:X2}{color.G:X2}{color.B:X2}"
+            : $"#{color.A:X2}{color.R:X2}{color.G:X2}{color.B:X2}";
+    }
+
+    private static bool TryParseHexColor(string? value, out Color color)
+    {
+        color = default;
+        if (value is null || value.Length is not (7 or 9) || value[0] != '#')
+        {
+            return false;
+        }
+
+        var hex = value.AsSpan(1);
+        var alpha = byte.MaxValue;
+        if (hex.Length == 8)
+        {
+            if (!byte.TryParse(
+                    hex[..2],
+                    System.Globalization.NumberStyles.HexNumber,
+                    null,
+                    out alpha))
+            {
+                return false;
+            }
+
+            hex = hex[2..];
+        }
+
+        if (!byte.TryParse(
+                hex[..2],
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out var red) ||
+            !byte.TryParse(
+                hex.Slice(2, 2),
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out var green) ||
+            !byte.TryParse(
+                hex.Slice(4, 2),
+                System.Globalization.NumberStyles.HexNumber,
+                null,
+                out var blue))
+        {
+            return false;
+        }
+
+        color = Color.FromArgb(alpha, red, green, blue);
+        return true;
     }
 
     private static Control PlaceInSecondColumn(Control control)

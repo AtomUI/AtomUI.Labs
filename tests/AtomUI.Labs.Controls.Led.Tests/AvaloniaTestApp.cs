@@ -1,5 +1,6 @@
 using System.Threading;
 using AtomUI;
+using AtomUI.Desktop.Controls;
 using AtomUI.Labs.Controls.Led;
 using Avalonia;
 using Avalonia.Headless;
@@ -52,6 +53,6 @@ internal sealed class TestApplication : Application
 {
     public override void Initialize()
     {
-        this.UseAtomUI(builder => builder.UseLed());
+        this.UseAtomUI(builder => builder.UseDesktopControls().UseLed());
     }
 }
