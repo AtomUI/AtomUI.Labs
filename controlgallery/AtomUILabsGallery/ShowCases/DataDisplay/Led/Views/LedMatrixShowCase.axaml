@@ -149,7 +149,6 @@
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <StackPanel Spacing="12">
                                 <labs:MatrixDisplay Text="ATOMUI LABS MATRIX MARQUEE 2026"
-                                                    Width="620"
                                                     Height="92"
                                                     DotSize="7"
                                                     DotSpacing="2"
@@ -182,15 +181,6 @@
                     </gallery:ShowCaseItem.DeferredContentTemplate>
                 </gallery:ShowCaseItem>
 
-                <gallery:ShowCaseItem Title="Dynamic counters"
-                                      Description="Fixed-length updates reuse glyph geometry while refreshing the current layout."
-                                      IsDeferredContentEnabled="True">
-                    <gallery:ShowCaseItem.DeferredContentTemplate>
-                        <DataTemplate x:DataType="led:LedMatrixViewModel">
-                            <led:LedDynamicDisplays />
-                        </DataTemplate>
-                    </gallery:ShowCaseItem.DeferredContentTemplate>
-                </gallery:ShowCaseItem>
             </gallery:ShowCasePanel>
         </gallery:GalleryStickyTabsHost>
     </Grid>
