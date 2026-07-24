@@ -23,7 +23,7 @@ LedDisplayLayoutMath
 
 ## 新增共享边界
 
-`LedDisplayLayoutMath` 直接位于 `src/AtomUI.Labs.Led/` 根目录，不新增 `Primitives`、`Shared` 或 `Internal` 目录。
+`LedDisplayLayoutMath` 直接位于 `src/AtomUI.Labs.Controls.Led/` 根目录，不新增 `Primitives`、`Shared` 或 `Internal` 目录。
 
 它只包含：
 

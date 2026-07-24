@@ -1,5 +1,5 @@
 using AtomUI.Theme;
-using AtomUI.Labs.Led;
+using AtomUI.Labs.Controls.Led;
 using AtomUI.Toolkits.GalleryBase;
 
 namespace AtomUILabsGallery;

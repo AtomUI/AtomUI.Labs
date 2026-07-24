@@ -1,5 +1,5 @@
-using AtomUI.Labs.Led.Matrix;
-using AtomUI.Labs.Led.Segment;
+using AtomUI.Labs.Controls.Led.Matrix;
+using AtomUI.Labs.Controls.Led.Segment;
 using Avalonia;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;

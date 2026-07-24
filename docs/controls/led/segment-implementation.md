@@ -1,12 +1,12 @@
 # LED Segment 工业级实现原理
 
-> 文档状态：当前实现契约，更新于 2026-07-20。本文描述现有 `AtomUI.Labs.Led.Segment` 源码；历史性能数据另见性能回归文档。
+> 文档状态：当前实现契约，更新于 2026-07-20。本文描述现有 `AtomUI.Labs.Controls.Led.Segment` 源码；历史性能数据另见性能回归文档。
 
 > 当前实现已将早期同形叠色Glow升级为共享Scoped Blur Glow，并补充`GlowRadius`。正式Glow契约与性能结论见[LED Glow技术路线选型](glow-technical-options.md)和[LED Glow原型评估](glow-prototype-evaluation.md)。
 
 > 当前Render不再逐段提交Geometry命令。可见Inactive段聚合为一个缓存Geometry，可见Active段聚合为另一个缓存Geometry；Active聚合同时用于一次Glow Effect和清晰本体绘制。Text变化只替换当前Active聚合，同槽位同Geometry配置继续复用Inactive聚合，不保留历史文本缓存。
 
-本文记录 `AtomUI.Labs.Led.Segment` 的目标实现原理。目标读者可以是第一次接触 LED 控件的新手，但实现标准必须按工业级自绘控件来约束。
+本文记录 `AtomUI.Labs.Controls.Led.Segment` 的目标实现原理。目标读者可以是第一次接触 LED 控件的新手，但实现标准必须按工业级自绘控件来约束。
 
 `Segment` 是十四段数码管路线。它不是字体控件，不是点阵控件，也不是硬件 LED 控制器。
 
@@ -55,7 +55,7 @@ Segment 的本质是基于字符映射表和参数化几何生成器的 Avalonia
 `Segment` 必须保持和正式控件库一致的工程入口习惯：公共控件类型留在控件根目录，内部实现按稳定职责进入子目录，主题通过 `*Themes.axaml` 聚合。
 
 ```text
-src/AtomUI.Labs.Led/Segment/
+src/AtomUI.Labs.Controls.Led/Segment/
   SegmentDisplay.cs
   SegmentOverflowMode.cs
   SegmentValueSanitizer.cs

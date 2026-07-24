@@ -4,7 +4,7 @@
 
 - Date: 2026-07-10 18:53:37 +08:00
 - Configuration: Release, .NET 10
-- Runner: `tools/performances/AtomUI.Labs.Led.Performance --count <N> --frames <N>`
+- Runner: `tools/performances/AtomUI.Labs.Controls.Led.Performance --count <N> --frames <N>`
 - Scope: CPU-side layout and DrawingGroup command submission; excludes GPU/platform presentation cost
 
 | Scenario | Characters | Updates | Total ms | us/update | KB total | bytes/update | Geometry commands |

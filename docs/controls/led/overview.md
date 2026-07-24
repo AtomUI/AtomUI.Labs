@@ -2,7 +2,7 @@
 
 > 文档状态：当前架构与公共契约，更新于 2026-07-20。历史审计、原型和性能数据在导航中单独标识，不作为当前实现事实。
 
-本文记录 `AtomUI.Labs.Led` 的组件域设计。LED 是 Labs 下的实验控件家族名，不是单一控件名。
+本文记录 `AtomUI.Labs.Controls.Led` 的组件域设计。LED 是 Labs 下的实验控件家族名，不是单一控件名。
 
 ## 文档导航
 
@@ -13,12 +13,12 @@
 
 ## 定位
 
-`AtomUI.Labs.Led` 用于承载 LED 风格显示控件。它不表示硬件 LED 控制器，也不表示普通文本控件。
+`AtomUI.Labs.Controls.Led` 用于承载 LED 风格显示控件。它不表示硬件 LED 控制器，也不表示普通文本控件。
 
 LED 家族目标包含两条并列路线：
 
 ```text
-AtomUI.Labs.Led
+AtomUI.Labs.Controls.Led
   Segment  十四段数码管路线
   Matrix   点阵屏路线
 ```
@@ -28,7 +28,7 @@ AtomUI.Labs.Led
 - `Segment` 以“段”为最小视觉单元，适合数字、英文字母、仪表读数和电子设备面板风格。
 - `Matrix` 以“点阵像素”为最小视觉单元，适合字符屏、公告屏、滚动文字和更自由的符号表达。
 
-共享基础代码直接放在 `src/AtomUI.Labs.Led/` 根目录下，当前包括 `LedCharacterNormalizer` 和 `LedDisplayLayoutMath`，不创建 `Primitives`、`Shared` 或 `Internal` 等独立目录。
+共享基础代码直接放在 `src/AtomUI.Labs.Controls.Led/` 根目录下，当前包括 `LedCharacterNormalizer` 和 `LedDisplayLayoutMath`，不创建 `Primitives`、`Shared` 或 `Internal` 等独立目录。
 
 LED 家族主题必须采用聚合入口：
 

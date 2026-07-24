@@ -14,8 +14,8 @@
                                                Status="Experimental"
                                                Subtitle="Fixed 5x7 dot-matrix LED-style text display."
                                                Description="Displays Latin text and symbols with configurable dot shape, panel border, glow, overflow and through-screen marquee."
-                                               Namespace="AtomUI.Labs.Led.Matrix"
-                                               Package="AtomUI.Labs.Led"
+                                               Namespace="AtomUI.Labs.Controls.Led.Matrix"
+                                               Package="AtomUI.Labs.Controls.Led"
                                                BaseClass="Control" />
             </gallery:GalleryStickyTabsHost.Header>
 

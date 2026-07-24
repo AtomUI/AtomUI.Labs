@@ -4,7 +4,7 @@
 
 ## 评估状态
 
-本报告记录2026-07-11的首轮可行性Smoke，不是最终选型或正式性能结论。原型只存在于`AtomUI.Labs.Led.Performance`工具，不进入Labs运行时程序集。
+本报告记录2026-07-11的首轮可行性Smoke，不是最终选型或正式性能结论。原型只存在于`AtomUI.Labs.Controls.Led.Performance`工具，不进入Labs运行时程序集。
 
 ## Avalonia公开API审计
 
@@ -136,7 +136,7 @@ Scoped Blur行为Gate：
 
 ```text
 tools/performances/
-  AtomUI.Labs.Led.GlowPrototype.Desktop/
+  AtomUI.Labs.Controls.Led.GlowPrototype.Desktop/
 ```
 
 该项目引用Performance试验程序集并通过friend assembly复用同一份路线A与Scoped Blur Renderer，不复制算法，也不引用或修改Labs运行时Glow实现。它并排展示：
@@ -150,7 +150,7 @@ tools/performances/
 运行：
 
 ```powershell
-dotnet run --project tools\performances\AtomUI.Labs.Led.GlowPrototype.Desktop\AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release
+dotnet run --project tools\performances\AtomUI.Labs.Controls.Led.GlowPrototype.Desktop\AtomUI.Labs.Controls.Led.GlowPrototype.Desktop.csproj -c Release
 ```
 
 Release构建为0警告、0错误。短时真实Win32进程Smoke保持运行5秒且未提前退出；该结果只证明桌面生命周期和窗口建立成功，不代表人工视觉验收或真实GPU性能已经通过。
@@ -166,7 +166,7 @@ Release构建为0警告、0错误。短时真实Win32进程Smoke保持运行5秒
 运行示例：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Labs.Led.GlowPrototype.Desktop/AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --benchmark --route scoped --instances 64 --warmup 30 --ticks 120
+dotnet run --project tools/performances/AtomUI.Labs.Controls.Led.GlowPrototype.Desktop/AtomUI.Labs.Controls.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --benchmark --route scoped --instances 64 --warmup 30 --ticks 120
 ```
 
 ### 五个独立进程
@@ -358,7 +358,7 @@ PerControl的P95比最佳Batch16高约1.4%，没有达到预先约定的15%改�
 
 ## 第七轮：正式控件接入
 
-Scoped Blur 与 PerControl 粒度已进入 `AtomUI.Labs.Led` 正式运行时。共享实现位于 `Glow/`，Matrix 和 Segment 不复制 Effect 创建、数值规整或作用域释放逻辑。
+Scoped Blur 与 PerControl 粒度已进入 `AtomUI.Labs.Controls.Led` 正式运行时。共享实现位于 `Glow/`，Matrix 和 Segment 不复制 Effect 创建、数值规整或作用域释放逻辑。
 
 正式公共契约：
 
@@ -431,7 +431,7 @@ Labs Sample增加Matrix默认关闭、Radius 6/12/24和多色Glow案例，以及
 运行方式：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Labs.Led.Performance/AtomUI.Labs.Led.Performance.csproj -c Release --no-build -- --formal-glow --frames 6000 --markdown output/formal-glow.md
+dotnet run --project tools/performances/AtomUI.Labs.Controls.Led.Performance/AtomUI.Labs.Controls.Led.Performance.csproj -c Release --no-build -- --formal-glow --frames 6000 --markdown output/formal-glow.md
 ```
 
 ## 第九轮：正式控件真实Win32窗口门禁
@@ -480,7 +480,7 @@ Segment在10实例60Hz时，NoGlow、Static和DynamicText均处于约62%同一�
 运行示例：
 
 ```powershell
-dotnet run --project tools/performances/AtomUI.Labs.Led.GlowPrototype.Desktop/AtomUI.Labs.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --formal-controls --control matrix --mode opacity --instances 10 --hz 60 --warmup 30 --ticks 120
+dotnet run --project tools/performances/AtomUI.Labs.Controls.Led.GlowPrototype.Desktop/AtomUI.Labs.Controls.Led.GlowPrototype.Desktop.csproj -c Release --no-build -- --formal-controls --control matrix --mode opacity --instances 10 --hz 60 --warmup 30 --ticks 120
 ```
 
 ## 第十轮：Segment基础Geometry命令聚合

@@ -6,4 +6,4 @@
 
 ## 控件目录
 
-- [LED 控件家族](led/overview.md)：已实现的 `AtomUI.Labs.Led` 包，包含十四段 Segment、5x7 Matrix、Glow 和 Marquee。
+- [LED 控件家族](led/overview.md)：已实现的 `AtomUI.Labs.Controls.Led` 包，包含十四段 Segment、5x7 Matrix、Glow 和 Marquee。

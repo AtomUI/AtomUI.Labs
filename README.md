@@ -27,10 +27,10 @@ Labs package names follow this pattern:
 dotnet add package AtomUI.Labs.Controls.<ControlName>
 ```
 
-The currently implemented LED family is published as an explicit naming exception:
+For example, install the currently implemented LED family with:
 
 ```bash
-dotnet add package AtomUI.Labs.Led
+dotnet add package AtomUI.Labs.Controls.Led
 ```
 
 Use a Labs package version that matches your AtomUI package version.

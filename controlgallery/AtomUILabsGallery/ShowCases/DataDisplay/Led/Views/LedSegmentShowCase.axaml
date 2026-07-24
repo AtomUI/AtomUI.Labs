@@ -14,8 +14,8 @@
                                                Status="Experimental"
                                                Subtitle="Fourteen-segment LED-style text display."
                                                Description="Displays numbers, Latin letters and common symbols with configurable segment geometry, layout, glow and inactive segments."
-                                               Namespace="AtomUI.Labs.Led.Segment"
-                                               Package="AtomUI.Labs.Led"
+                                               Namespace="AtomUI.Labs.Controls.Led.Segment"
+                                               Package="AtomUI.Labs.Controls.Led"
                                                BaseClass="Control" />
             </gallery:GalleryStickyTabsHost.Header>
 

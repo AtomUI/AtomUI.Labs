@@ -3,7 +3,7 @@
 > 文档状态：历史 MVP 收口审计（审计日期 2026-07-10）。本文保留当时边界和修复证据，不描述后续 Glow、Marquee、Gallery 或当前测试状态。
 
 - 审计日期：2026-07-10
-- 审计对象：`AtomUI.Labs.Led.Matrix.MatrixDisplay`
+- 审计对象：当时命名为 `AtomUI.Labs.Led.Matrix.MatrixDisplay` 的 `MatrixDisplay`；当前命名见实现文档。
 - 审计类型：MVP 交付收口，不进行行为修改或性能优化
 - 结论：未发现高严重度运行缺陷；审计发现已于同日修复并进入回归验证
 
@@ -90,7 +90,7 @@ Matrix 对 `DotSize`、间距和 Padding 有明确数值规整，但 `CornerRadi
 
 - Matrix 专项测试：114/114 通过，Release net10.0。
 - Labs 全量测试：259/259 通过，Release net10.0。
-- Labs NuGet pack：迁移后成功生成 `AtomUI.Labs.Led.6.0.8.nupkg`，同时包含 `net10.0` 与 `net8.0` 资产。
+- Labs NuGet pack：当时成功生成旧名产物 `AtomUI.Labs.Led.6.0.8.nupkg`，同时包含 `net10.0` 与 `net8.0` 资产；该名称只记录历史结果。
 - 包目标：`lib/net8.0`、`lib/net10.0`。
 - 包依赖：`AtomUI.Core 6.0.8`、`Avalonia 12.0.5`。
 - Sample Debug和Release build：均为0 warning，0 error。

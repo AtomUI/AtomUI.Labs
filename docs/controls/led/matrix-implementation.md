@@ -2,7 +2,7 @@
 
 > 文档状态：当前实现契约，更新于 2026-07-20。性能数值链接指向带日期的历史证据，不代表当前机器基线。
 
-本文记录 `AtomUI.Labs.Led.Matrix` 的当前实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
+本文记录 `AtomUI.Labs.Controls.Led.Matrix` 的当前实现设计。Matrix 是 LED 家族中的点阵屏路线，不是字体控件，不是 Segment 的升级版，也不是硬件 LED 控制器。
 
 公共控件类型为 `MatrixDisplay`，基础显示为单行 `5x7` 等宽点阵文本，并可选启用 Glow 和单向穿屏 Marquee。
 
@@ -35,7 +35,7 @@
 Matrix 按当前真实职责组织：
 
 ```text
-src/AtomUI.Labs.Led/Matrix/
+src/AtomUI.Labs.Controls.Led/Matrix/
   MatrixDisplay.cs
   MatrixDisplayAutomationPeer.cs
   MatrixDotShape.cs
@@ -558,7 +558,7 @@ Labs 程序集通过 `https://atomui.net/labs` XML 命名空间公开 `MatrixDis
 Matrix 使用独立测量程序：
 
 ```text
-tools/performances/AtomUI.Labs.Led.Performance
+tools/performances/AtomUI.Labs.Controls.Led.Performance
 ```
 
 逐点基线位于 [matrix-performance-baseline.md](matrix-performance-baseline.md)，几何批处理结果位于 [matrix-performance-geometry-batch.md](matrix-performance-geometry-batch.md)，600帧常见动态负载位于 [matrix-performance-dynamic-load.md](matrix-performance-dynamic-load.md)，分配归因与36,000帧长稳结果位于 [matrix-performance-allocation-and-soak.md](matrix-performance-allocation-and-soak.md)。测量范围是 CPU 侧布局与 `DrawingGroup` 命令提交，不包含 GPU 或平台呈现成本，也不把机器相关毫秒数作为单元测试阈值。

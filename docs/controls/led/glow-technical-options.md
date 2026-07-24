@@ -64,7 +64,7 @@ Glow 属性只触发重绘，不触发 Measure。`GlowBrush` 变为 `null` 时�
 
 ## 性能门禁
 
-`tools/performances/AtomUI.Labs.Led.Performance --formal-glow` 是当前正式命令提交基准。它测量 DrawingGroup 构建和命令提交，不宣称代表 GPU 呈现时间。
+`tools/performances/AtomUI.Labs.Controls.Led.Performance --formal-glow` 是当前正式命令提交基准。它测量 DrawingGroup 构建和命令提交，不宣称代表 GPU 呈现时间。
 
 PR 级单进程门禁：
 

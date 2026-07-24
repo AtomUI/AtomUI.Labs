@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="AtomUI.Labs.Led.Tests" />
+        <InternalsVisibleTo Include="AtomUI.Labs.Controls.Led.Tests" />
     </ItemGroup>
 
     <ItemGroup>
@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../src/AtomUI.Labs.Led/AtomUI.Labs.Led.csproj"/>
+        <ProjectReference Include="../../src/AtomUI.Labs.Controls.Led/AtomUI.Labs.Controls.Led.csproj"/>
         <PackageReference Include="Avalonia"/>
         <PackageReference Include="AtomUI.Desktop.Controls"/>
         <PackageReference Include="AtomUI.Toolkits.GalleryBase"/>

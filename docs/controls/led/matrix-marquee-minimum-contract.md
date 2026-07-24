@@ -7,7 +7,7 @@
 Marquee与Glow同属LED基础显示之上的可选动态增强领域，但二者是平行模块：
 
 ```text
-src/AtomUI.Labs.Led/
+src/AtomUI.Labs.Controls.Led/
 ├── Matrix/       MatrixDisplay、字符、布局和Geometry
 ├── Segment/      SegmentDisplay及十四段基础实现
 ├── Glow/         可见Active Geometry的光效增强
