@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:atom="https://atomui.net"
              xmlns:gallery="https://atomui.net/oss-controls/gallery"
-             xmlns:labs="https://atomui.net/labs"
+             xmlns:atom.labs="https://atomui.net/labs"
              xmlns:led="using:AtomUILabsGallery.ShowCases.Led"
              x:Class="AtomUILabsGallery.ShowCases.Led.LedMatrixShowCase"
              x:DataType="led:LedMatrixViewModel">
@@ -32,8 +32,8 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <StackPanel Spacing="12">
-                                <labs:MatrixDisplay Text="MATRIX 5X7" />
-                                <labs:MatrixDisplay Text="?-.:_+=/"
+                                <atom.labs:MatrixDisplay Text="MATRIX 5X7" />
+                                <atom.labs:MatrixDisplay Text="?-.:_+=/"
                                                     DotSize="7"
                                                     DotSpacing="2"
                                                     CharacterSpacing="8"
@@ -42,7 +42,7 @@
                                                     ActiveBrush="#5FECFF"
                                                     InactiveBrush="#265FECFF"
                                                     CornerRadius="8" />
-                                <labs:MatrixDisplay Text="A中Z"
+                                <atom.labs:MatrixDisplay Text="A中Z"
                                                     DotSize="7"
                                                     DotSpacing="2"
                                                     CharacterSpacing="9" />
@@ -57,16 +57,16 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12">
-                                <labs:MatrixDisplay Text="CIRCLE"
+                                <atom.labs:MatrixDisplay Text="CIRCLE"
                                                     DotShape="Circle"
                                                     DotSize="6"
                                                     Padding="12" />
-                                <labs:MatrixDisplay Grid.Column="1"
+                                <atom.labs:MatrixDisplay Grid.Column="1"
                                                     Text="SQUARE"
                                                     DotShape="Square"
                                                     DotSize="6"
                                                     Padding="12" />
-                                <labs:MatrixDisplay Grid.Column="2"
+                                <atom.labs:MatrixDisplay Grid.Column="2"
                                                     Text="ROUND"
                                                     DotShape="RoundedSquare"
                                                     DotCornerRadiusRatio="0.35"
@@ -83,7 +83,7 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                                <labs:MatrixDisplay Text="BORDER"
+                                <atom.labs:MatrixDisplay Text="BORDER"
                                                     Height="108"
                                                     BorderBrush="#4A9DB5"
                                                     BorderThickness="2"
@@ -91,7 +91,7 @@
                                                     Padding="14"
                                                     HorizontalContentAlignment="Center"
                                                     VerticalContentAlignment="Center" />
-                                <labs:MatrixDisplay Grid.Column="1"
+                                <atom.labs:MatrixDisplay Grid.Column="1"
                                                     Text="ASYMM"
                                                     Height="108"
                                                     BorderBrush="#FFBE5C"
@@ -111,7 +111,7 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <StackPanel Spacing="12">
-                                <labs:MatrixDisplay Text="CENTER"
+                                <atom.labs:MatrixDisplay Text="CENTER"
                                                     Height="120"
                                                     DotSize="7"
                                                     DotSpacing="2"
@@ -123,7 +123,7 @@
                                                     ActiveBrush="#67F2A3"
                                                     InactiveBrush="#2267F2A3"
                                                     CornerRadius="8" />
-                                <labs:MatrixDisplay Text="1234567890"
+                                <atom.labs:MatrixDisplay Text="1234567890"
                                                     Width="280"
                                                     Height="72"
                                                     DotSize="8"
@@ -148,7 +148,7 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedMatrixViewModel">
                             <StackPanel Spacing="12">
-                                <labs:MatrixDisplay Text="ATOMUI LABS MATRIX MARQUEE 2026"
+                                <atom.labs:MatrixDisplay Text="ATOMUI LABS MATRIX MARQUEE 2026"
                                                     Height="92"
                                                     DotSize="7"
                                                     DotSpacing="2"
@@ -164,7 +164,7 @@
                                                     GlowOpacity="0.55"
                                                     GlowRadius="8"
                                                     CornerRadius="8" />
-                                <labs:MatrixDisplay Text="GLOW 2026"
+                                <atom.labs:MatrixDisplay Text="GLOW 2026"
                                                     DotSize="7"
                                                     DotSpacing="2"
                                                     CharacterSpacing="9"

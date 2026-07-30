@@ -23,10 +23,10 @@ this.UseAtomUI(builder => builder.UseLed());
 
 ```xml
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:labs="https://atomui.net/labs">
+        xmlns:atom.labs="https://atomui.net/labs">
     <StackPanel Spacing="12">
-        <labs:SegmentDisplay Text="12:45" />
-        <labs:MatrixDisplay Text="ATOMUI LABS" />
+        <atom.labs:SegmentDisplay Text="12:45" />
+        <atom.labs:MatrixDisplay Text="ATOMUI LABS" />
     </StackPanel>
 </Window>
 ```

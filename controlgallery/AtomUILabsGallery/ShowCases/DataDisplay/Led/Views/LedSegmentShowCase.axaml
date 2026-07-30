@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:atom="https://atomui.net"
              xmlns:gallery="https://atomui.net/oss-controls/gallery"
-             xmlns:labs="https://atomui.net/labs"
+             xmlns:atom.labs="https://atomui.net/labs"
              xmlns:led="using:AtomUILabsGallery.ShowCases.Led"
              x:Class="AtomUILabsGallery.ShowCases.Led.LedSegmentShowCase"
              x:DataType="led:LedSegmentViewModel">
@@ -32,12 +32,12 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedSegmentViewModel">
                             <StackPanel Spacing="12">
-                                <labs:SegmentDisplay Text="12:45"
+                                <atom.labs:SegmentDisplay Text="12:45"
                                                      CharacterHeight="70"
                                                      SegmentThickness="7"
                                                      SegmentGap="3"
                                                      CharacterSpacing="9" />
-                                <labs:SegmentDisplay Text="A-01.5"
+                                <atom.labs:SegmentDisplay Text="A-01.5"
                                                      CharacterHeight="64"
                                                      SegmentThickness="7"
                                                      SegmentGap="2"
@@ -57,7 +57,7 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedSegmentViewModel">
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                                <labs:SegmentDisplay Text="3.14"
+                                <atom.labs:SegmentDisplay Text="3.14"
                                                      CharacterHeight="72"
                                                      SegmentThickness="10"
                                                      SegmentGap="2"
@@ -68,7 +68,7 @@
                                                      ActiveBrush="#B7FF67"
                                                      InactiveBrush="#24B7FF67"
                                                      CornerRadius="10" />
-                                <labs:SegmentDisplay Grid.Column="1"
+                                <atom.labs:SegmentDisplay Grid.Column="1"
                                                      Text="CLEAN"
                                                      CharacterHeight="58"
                                                      SegmentThickness="7"
@@ -89,7 +89,7 @@
                     <gallery:ShowCaseItem.DeferredContentTemplate>
                         <DataTemplate x:DataType="led:LedSegmentViewModel">
                             <StackPanel Spacing="12">
-                                <labs:SegmentDisplay Text="CENTER"
+                                <atom.labs:SegmentDisplay Text="CENTER"
                                                      Height="140"
                                                      CharacterHeight="64"
                                                      HorizontalContentAlignment="Center"
@@ -99,7 +99,7 @@
                                                      ActiveBrush="#67F2A3"
                                                      InactiveBrush="#2267F2A3"
                                                      CornerRadius="10" />
-                                <labs:SegmentDisplay Text="1234567890"
+                                <atom.labs:SegmentDisplay Text="1234567890"
                                                      Width="300"
                                                      Height="72"
                                                      CharacterHeight="72"

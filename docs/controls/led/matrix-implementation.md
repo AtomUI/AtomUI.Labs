@@ -538,7 +538,7 @@ Matrix 不得使用 AtomUI 已经成型的控件包：
 Labs 程序集通过 `https://atomui.net/labs` XML 命名空间公开 `MatrixDisplay`。验收必须包含真实编译 AXAML，而不能只通过 C# 构造器证明类型可用：
 
 ```xml
-<labs:MatrixDisplay Text="axaml 2026"
+<atom.labs:MatrixDisplay Text="axaml 2026"
                     DotSize="7"
                     HorizontalContentAlignment="Center" />
 ```
