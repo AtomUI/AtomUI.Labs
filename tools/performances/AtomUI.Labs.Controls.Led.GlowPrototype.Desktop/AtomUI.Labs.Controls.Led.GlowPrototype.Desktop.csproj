@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>AtomUI.Labs.Controls.Led.GlowPrototype.Desktop</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../AtomUI.Labs.Controls.Led.Performance/AtomUI.Labs.Controls.Led.Performance.csproj" />
+    </ItemGroup>
+</Project>

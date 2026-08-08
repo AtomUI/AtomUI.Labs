@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom.labs="https://atomui.net/labs"
+             x:Class="AtomUI.Labs.Controls.Led.Tests.Segment.SegmentAxamlHost">
+    <atom.labs:SegmentDisplay x:Name="PART_Segment"
+                         Text="12:45"
+                         CharacterHeight="64"
+                         CharacterAspectRatio="0.6"
+                         SegmentThickness="7"
+                         HorizontalContentAlignment="Center"
+                         ShowInactiveSegments="False" />
+</UserControl>

@@ -27,6 +27,12 @@ Labs package names follow this pattern:
 dotnet add package AtomUI.Labs.Controls.<ControlName>
 ```
 
+For example, install the currently implemented LED family with:
+
+```bash
+dotnet add package AtomUI.Labs.Controls.Led
+```
+
 Use a Labs package version that matches your AtomUI package version.
 
 ## Common Commands
@@ -45,6 +51,8 @@ Package artifacts are written to `output/Nuget/<Configuration>`.
 
 - [Engineering overview](docs/engineering/overview.md)
 - [Build and packaging](docs/architecture/build-and-packaging.md)
+- [Experimental controls](docs/controls/overview.md)
+- [LED control family](docs/controls/led/overview.md)
 - [Global engineering guidelines](docs/global-engineering-guidelines.md)
 
 ## Status

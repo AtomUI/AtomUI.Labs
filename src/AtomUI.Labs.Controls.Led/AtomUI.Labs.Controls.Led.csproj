@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>$(AtomUITargetFrameworks)</TargetFrameworks>
+        <RootNamespace>AtomUI.Labs.Controls.Led</RootNamespace>
+        <Title>AtomUI Labs LED Controls</Title>
+        <Description>Experimental LED-style segment and matrix display controls for AtomUI applications.</Description>
+        <PackageTags>avalonia;AtomUI;Labs;LED;Segment Display;Matrix Display;Desktop;Experimental</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="$(MSBuildThisFileDirectory)../../README.nuget.md" />
+        <None Include="README.nuget.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="AtomUI.Labs.Controls.Led.Tests" />
+        <InternalsVisibleTo Include="AtomUI.Labs.Controls.Led.Performance" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="AtomUI.Core" />
+    </ItemGroup>
+</Project>

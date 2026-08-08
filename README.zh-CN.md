@@ -27,6 +27,12 @@ Labs 包名遵循以下格式：
 dotnet add package AtomUI.Labs.Controls.<ControlName>
 ```
 
+例如，安装当前已经实现的 LED 控件家族：
+
+```bash
+dotnet add package AtomUI.Labs.Controls.Led
+```
+
 Labs 包版本应与应用使用的 AtomUI 主包版本保持一致。
 
 ## 常用命令
@@ -45,6 +51,8 @@ git diff --check
 
 - [工程规范总览](docs/engineering/overview.md)
 - [构建、打包与发布](docs/architecture/build-and-packaging.md)
+- [实验控件文档](docs/controls/overview.md)
+- [LED 控件家族](docs/controls/led/overview.md)
 - [全局工程规范](docs/global-engineering-guidelines.md)
 
 ## 状态说明

@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom.labs="https://atomui.net/labs"
+             x:Class="AtomUI.Labs.Controls.Led.Tests.Matrix.MatrixAxamlHost">
+    <atom.labs:MatrixDisplay x:Name="PART_Matrix"
+                        Text="axaml 2026"
+                        DotSize="7"
+                        DotShape="RoundedSquare"
+                        DotCornerRadiusRatio="0.3"
+                        BorderBrush="Blue"
+                        BorderThickness="1,2,3,4"
+                        IsMarqueeEnabled="True"
+                        MarqueeSpeed="64"
+                        MarqueeRepeatDelay="0:0:1"
+                        HorizontalContentAlignment="Center"
+                        ShowInactiveDots="False" />
+</UserControl>

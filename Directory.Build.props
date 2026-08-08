@@ -3,7 +3,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>latest</LangVersion>
-        <RestoreAdditionalProjectSources>$(RestoreAdditionalProjectSources);$(MSBuildThisFileDirectory)../AtomUI.Base/output/Nuget/Release</RestoreAdditionalProjectSources>
+        <RestoreAdditionalProjectSources Condition="Exists('$(MSBuildThisFileDirectory)../AtomUI.Base/output/Nuget/Release')">$(RestoreAdditionalProjectSources);$(MSBuildThisFileDirectory)../AtomUI.Base/output/Nuget/Release</RestoreAdditionalProjectSources>
     </PropertyGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)/build/Version.props"/>
@@ -11,4 +11,3 @@
     <Import Project="$(MSBuildThisFileDirectory)/build/PackageMetaInfo.props"/>
     <Import Project="$(MSBuildThisFileDirectory)/build/Output.props"/>
 </Project>
-
