@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>$(AtomUIDevelopTargetFramework)</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>AtomUI.Labs.Controls.ImageGallery.Benchmarks</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Headless" />
+        <ProjectReference Include="../../src/AtomUI.Labs.Controls.ImageGallery/AtomUI.Labs.Controls.ImageGallery.csproj" />
+    </ItemGroup>
+</Project>
