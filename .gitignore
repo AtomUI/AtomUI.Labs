@@ -214,3 +214,4 @@ cmake-build-*/
 
 controlgallery/AtomUILabsGallery/GeneratedFiles/Avalonia.Generators/
 .claude/settings.local.json
+.codex
