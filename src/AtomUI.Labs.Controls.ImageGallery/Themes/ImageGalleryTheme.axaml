@@ -1,0 +1,301 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:atom="https://atomui.net"
+                    xmlns:gallery="using:AtomUI.Labs.Controls.ImageGallery"
+                    xmlns:layout="using:AtomUI.Labs.Controls.ImageGallery.Layout"
+                    xmlns:viewport="using:AtomUI.Labs.Controls.ImageGallery.Viewport"
+                    xmlns:filmstrip="using:AtomUI.Labs.Controls.ImageGallery.Filmstrip"
+                    xmlns:appearance="using:AtomUI.Labs.Controls.ImageGallery.Appearance"
+                    xmlns:localization="using:AtomUI.Labs.Controls.ImageGallery.Localization"
+                    x:ClassModifier="internal">
+    <ControlTheme x:Key="{x:Type filmstrip:ImageGalleryFilmstripScrollViewer}"
+                  TargetType="filmstrip:ImageGalleryFilmstripScrollViewer">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ScrollContentPresenter x:Name="PART_ContentPresenter"
+                                        Content="{TemplateBinding Content}"
+                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                        Padding="{TemplateBinding Padding}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                        VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}"
+                                        HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                        VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                        IsScrollChainingEnabled="{TemplateBinding IsScrollChainingEnabled}" />
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type gallery:ImageGallery}"
+                  TargetType="gallery:ImageGallery">
+        <Setter Property="Background"
+                Value="{atom:SharedTokenResource ColorBgContainer}" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <filmstrip:ImageGalleryVirtualizingPanel />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border Classes="ImageGalleryRootBackground"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            IsHitTestVisible="False"
+                            IsVisible="{TemplateBinding IsMainImagePresented}" />
+                    <layout:ImageGalleryOverlayPanel>
+                        <Border x:Name="PART_ViewportHost"
+                                IsHitTestVisible="{TemplateBinding IsMainImagePresented}"
+                                layout:ImageGalleryOverlayPanel.Role="Viewport">
+                            <Grid>
+                                <viewport:ImageGalleryViewportPresenter x:Name="PART_Viewport" />
+                                <TextBlock x:Name="PART_EmptyText"
+                                           Classes="ImageGalleryEmptyText"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                           IsHitTestVisible="False"
+                                           IsVisible="False"
+                                           Text="{localization:ImageGalleryLangResource Empty}" />
+                                <TextBlock x:Name="PART_LoadingText"
+                                           Classes="ImageGalleryLoadingText"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                           IsHitTestVisible="False"
+                                           IsVisible="False"
+                                           Text="{localization:ImageGalleryLangResource Loading}" />
+                                <TextBlock x:Name="PART_ErrorText"
+                                           Classes="ImageGalleryErrorText"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Foreground="{atom:SharedTokenResource ColorTextSecondary}"
+                                           IsHitTestVisible="False"
+                                           IsVisible="False"
+                                           Text="{localization:ImageGalleryLangResource Error}" />
+                            </Grid>
+                        </Border>
+
+                        <appearance:ImageGalleryButton Classes="ImageGalleryViewportNavigation Previous"
+                                Appearance="{TemplateBinding ViewportNavigationButtonAppearance}"
+                                Width="44"
+                                Height="44"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                IsVisible="{TemplateBinding IsEffectivePreviousViewportNavigationVisible}"
+                                Command="{TemplateBinding PreviousCommand}"
+                                layout:ImageGalleryOverlayPanel.Role="PreviousViewportNavigation">
+                            <appearance:ImageGalleryGlyph Kind="Previous" />
+                        </appearance:ImageGalleryButton>
+
+                        <appearance:ImageGalleryButton Classes="ImageGalleryViewportNavigation Next"
+                                Appearance="{TemplateBinding ViewportNavigationButtonAppearance}"
+                                Width="44"
+                                Height="44"
+                                Padding="0"
+                                HorizontalContentAlignment="Center"
+                                VerticalContentAlignment="Center"
+                                IsVisible="{TemplateBinding IsEffectiveNextViewportNavigationVisible}"
+                                Command="{TemplateBinding NextCommand}"
+                                layout:ImageGalleryOverlayPanel.Role="NextViewportNavigation">
+                            <appearance:ImageGalleryGlyph Kind="Next" />
+                        </appearance:ImageGalleryButton>
+
+                        <Border x:Name="PART_Toolbar"
+                                Classes="ImageGalleryToolbar"
+                                IsVisible="{TemplateBinding IsEffectiveToolbarVisible}"
+                                Background="{atom:SharedTokenResource ColorBgContainer}"
+                                BorderBrush="{atom:SharedTokenResource ColorBorderSecondary}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,8"
+                                layout:ImageGalleryOverlayPanel.Role="Toolbar">
+                            <layout:ImageGalleryToolbarPanel x:Name="PART_ToolbarItems"
+                                                           Classes="ImageGalleryToolbarItems"
+                                                           Orientation="Horizontal"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           Spacing="{TemplateBinding ToolbarItemSpacing}">
+                                <appearance:ImageGalleryToolbarText Classes="ImageGalleryToolbarTitle"
+                                                                    HorizontalAlignment="Center"
+                                                                    VerticalAlignment="Center"
+                                                                    MaxWidth="240"
+                                                                    TextTrimming="CharacterEllipsis"
+                                                                    IsVisible="{TemplateBinding IsEffectiveToolbarTitleVisible}"
+                                                                    Text="{TemplateBinding CurrentTitle}" />
+                                <layout:ImageGalleryToolbarPanel Classes="ImageGalleryToolbarZoomItems"
+                                                               Orientation="Horizontal"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               Spacing="{TemplateBinding ToolbarItemSpacing}"
+                                                               IsVisible="{TemplateBinding IsEffectiveToolbarZoomControlsVisible}">
+                                    <appearance:ImageGalleryButton Classes="ImageGalleryToolbarButton"
+                                            Appearance="{TemplateBinding ToolbarButtonAppearance}"
+                                            Width="32"
+                                            Height="32"
+                                            Padding="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            AutomationProperties.Name="{localization:ImageGalleryLangResource ZoomOut}"
+                                            Command="{TemplateBinding ZoomOutCommand}">
+                                        <appearance:ImageGalleryGlyph Kind="Subtract" />
+                                    </appearance:ImageGalleryButton>
+                                    <appearance:ImageGalleryToolbarText Classes="ImageGalleryToolbarZoomPercentage"
+                                                                        Width="56"
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        Text="{TemplateBinding EffectiveZoomPercentageText}" />
+                                    <appearance:ImageGalleryButton Classes="ImageGalleryToolbarButton"
+                                            Appearance="{TemplateBinding ToolbarButtonAppearance}"
+                                            Width="32"
+                                            Height="32"
+                                            Padding="0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            AutomationProperties.Name="{localization:ImageGalleryLangResource ZoomIn}"
+                                            Command="{TemplateBinding ZoomInCommand}">
+                                        <appearance:ImageGalleryGlyph Kind="Add" />
+                                    </appearance:ImageGalleryButton>
+                                    <appearance:ImageGalleryButton Classes="ImageGalleryToolbarButton"
+                                            Appearance="{TemplateBinding ToolbarButtonAppearance}"
+                                            MinWidth="48"
+                                            Height="32"
+                                            Padding="6,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Command="{TemplateBinding FitCommand}"
+                                            AutomationProperties.Name="{localization:ImageGalleryLangResource Fit}">
+                                        <appearance:ImageGalleryToolbarText Text="{localization:ImageGalleryLangResource Fit}" />
+                                    </appearance:ImageGalleryButton>
+                                    <appearance:ImageGalleryButton Classes="ImageGalleryToolbarButton"
+                                            Appearance="{TemplateBinding ToolbarButtonAppearance}"
+                                            MinWidth="48"
+                                            Height="32"
+                                            Padding="6,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            Command="{TemplateBinding ActualSizeCommand}"
+                                            AutomationProperties.Name="{localization:ImageGalleryLangResource ActualSize}">
+                                        <appearance:ImageGalleryToolbarText Text="1:1" />
+                                    </appearance:ImageGalleryButton>
+                                </layout:ImageGalleryToolbarPanel>
+                                <appearance:ImageGalleryButton Classes="ImageGalleryToolbarButton"
+                                        Appearance="{TemplateBinding ToolbarButtonAppearance}"
+                                        Width="32"
+                                        Height="32"
+                                        Padding="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        IsVisible="{TemplateBinding IsEffectiveToolbarRotationVisible}"
+                                        AutomationProperties.Name="{localization:ImageGalleryLangResource RotateClockwise}"
+                                        Command="{TemplateBinding RotateClockwiseCommand}">
+                                    <appearance:ImageGalleryGlyph Kind="RotateClockwise" />
+                                </appearance:ImageGalleryButton>
+                                <ContentPresenter Classes="ImageGalleryToolbarContent"
+                                                  Content="{TemplateBinding ToolbarContent}"
+                                                  ContentTemplate="{TemplateBinding ToolbarContentTemplate}"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center" />
+                            </layout:ImageGalleryToolbarPanel>
+                        </Border>
+
+                        <Border x:Name="PART_Filmstrip"
+                                Classes="ImageGalleryFilmstrip"
+                                Background="{atom:SharedTokenResource ColorBgContainer}"
+                                BorderBrush="{atom:SharedTokenResource ColorBorderSecondary}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                IsVisible="{TemplateBinding IsEffectiveFilmstripVisible}"
+                                layout:ImageGalleryOverlayPanel.Role="Filmstrip">
+                            <filmstrip:ImageGalleryFilmstripLayoutPanel>
+                                <appearance:ImageGalleryButton Classes="ImageGalleryAddButton"
+                                        Appearance="{TemplateBinding AddImageButtonAppearance}"
+                                        Width="36"
+                                        Height="36"
+                                        Padding="0"
+                                        IsVisible="{TemplateBinding IsAddImageButtonVisible}"
+                                        IsEnabled="{TemplateBinding IsAddImageButtonEnabled}"
+                                        Command="{TemplateBinding AddImageCommand}"
+                                        CommandParameter="{TemplateBinding AddImageCommandParameter}"
+                                        filmstrip:ImageGalleryFilmstripLayoutPanel.Role="Add">
+                                    <appearance:ImageGalleryGlyph Kind="Add" />
+                                </appearance:ImageGalleryButton>
+                                <appearance:ImageGalleryButton Classes="ImageGalleryFilmstripNavigation Previous"
+                                        Appearance="{TemplateBinding FilmstripNavigationButtonAppearance}"
+                                        Width="36"
+                                        Height="36"
+                                        Padding="0"
+                                        IsVisible="{TemplateBinding IsFilmstripNavigationEnabled}"
+                                        Command="{TemplateBinding PreviousCommand}"
+                                        filmstrip:ImageGalleryFilmstripLayoutPanel.Role="Previous">
+                                    <appearance:ImageGalleryGlyph Kind="{TemplateBinding FilmstripPreviousGlyph}" />
+                                </appearance:ImageGalleryButton>
+                                <filmstrip:ImageGalleryFilmstripScrollViewer x:Name="PART_ScrollViewer"
+                                                                                 HorizontalScrollBarVisibility="Hidden"
+                                                                                 VerticalScrollBarVisibility="Hidden"
+                                                                                 filmstrip:ImageGalleryFilmstripLayoutPanel.Role="Items">
+                                    <ItemsPresenter x:Name="PART_ItemsPresenter"
+                                                    ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                </filmstrip:ImageGalleryFilmstripScrollViewer>
+                                <appearance:ImageGalleryButton Classes="ImageGalleryFilmstripNavigation Next"
+                                        Appearance="{TemplateBinding FilmstripNavigationButtonAppearance}"
+                                        Width="36"
+                                        Height="36"
+                                        Padding="0"
+                                        IsVisible="{TemplateBinding IsFilmstripNavigationEnabled}"
+                                        Command="{TemplateBinding NextCommand}"
+                                        filmstrip:ImageGalleryFilmstripLayoutPanel.Role="Next">
+                                    <appearance:ImageGalleryGlyph Kind="{TemplateBinding FilmstripNextGlyph}" />
+                                </appearance:ImageGalleryButton>
+                            </filmstrip:ImageGalleryFilmstripLayoutPanel>
+                        </Border>
+                    </layout:ImageGalleryOverlayPanel>
+                    <Border Classes="ImageGalleryRootBorder"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            IsHitTestVisible="False" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:toolbar-vertical /template/ layout|ImageGalleryToolbarPanel.ImageGalleryToolbarItems">
+            <Setter Property="Orientation" Value="Vertical" />
+        </Style>
+        <Style Selector="^:toolbar-vertical /template/ layout|ImageGalleryToolbarPanel.ImageGalleryToolbarZoomItems">
+            <Setter Property="Orientation" Value="Vertical" />
+        </Style>
+        <Style Selector="^:empty /template/ TextBlock.ImageGalleryEmptyText">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:loading /template/ TextBlock.ImageGalleryLoadingText">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:error /template/ TextBlock.ImageGalleryErrorText">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
+        <Style Selector="^:resource-only /template/ TextBlock.ImageGalleryEmptyText">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^:resource-only /template/ TextBlock.ImageGalleryLoadingText">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="^:resource-only /template/ TextBlock.ImageGalleryErrorText">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>$(AtomUITargetFrameworks)</TargetFrameworks>
+        <RootNamespace>AtomUI.Labs.Controls.ImageGallery</RootNamespace>
+        <Title>AtomUI Labs ImageGallery Control</Title>
+        <Description>An experimental immersive image gallery control for AtomUI applications.</Description>
+        <PackageTags>avalonia;AtomUI;Labs;Image Gallery;Image Viewer;Desktop;Experimental</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove="$(MSBuildThisFileDirectory)../../README.nuget.md" />
+        <None Include="README.nuget.md" Pack="true" PackagePath="/" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="AtomUI.Labs.Controls.ImageGallery.Tests" />
+        <InternalsVisibleTo Include="AtomUI.Labs.Controls.ImageGallery.Benchmarks" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="AtomUI.Core" />
+        <PackageReference Include="AtomUI.Generator" PrivateAssets="all" />
+    </ItemGroup>
+</Project>

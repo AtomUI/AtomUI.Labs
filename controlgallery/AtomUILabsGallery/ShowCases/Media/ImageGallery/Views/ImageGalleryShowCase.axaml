@@ -1,0 +1,300 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom="https://atomui.net"
+             xmlns:gallery="https://atomui.net/oss-controls/gallery"
+             xmlns:atom.labs="https://atomui.net/labs"
+             xmlns:labs="https://atomui.net/labs"
+             xmlns:imageGallery="using:AtomUILabsGallery.ShowCases.ImageGallery"
+             x:Class="AtomUILabsGallery.ShowCases.ImageGallery.ImageGalleryShowCase"
+             x:DataType="imageGallery:ImageGalleryViewModel">
+    <UserControl.Resources>
+        <atom.labs:ImageGalleryToolbarAppearance x:Key="ShowcaseToolbarAppearance"
+                                                       Background="#CC111418"
+                                                       Foreground="#F8FAFC"
+                                                       BorderBrush="Transparent"
+                                                       BorderThickness="0"
+                                                       CornerRadius="14"
+                                                       Padding="16,9"
+                                                       ItemSpacing="10" />
+        <atom.labs:ImageGalleryButtonAppearance x:Key="ShowcaseToolbarButtonAppearance"
+                                                      Background="Transparent"
+                                                      Foreground="#F8FAFC"
+                                                      BorderBrush="Transparent"
+                                                      BorderThickness="0"
+                                                      CornerRadius="8"
+                                                      Width="34"
+                                                      Height="34"
+                                                      IconSize="18"
+                                                      PointerOverBackground="#24FFFFFF"
+                                                      PointerOverForeground="#FFFFFF"
+                                                      PressedBackground="#3DFFFFFF"
+                                                      PressedForeground="#FFFFFF"
+                                                      PointerOverBorderBrush="Transparent"
+                                                      PressedBorderBrush="Transparent"
+                                                      DisabledBackground="Transparent"
+                                                      DisabledForeground="#F8FAFC"
+                                                      DisabledBorderBrush="Transparent"
+                                                      DisabledOpacity="0.65" />
+        <atom.labs:ImageGalleryButtonAppearance x:Key="ShowcaseViewportNavigationAppearance"
+                                                      Background="#CC111418"
+                                                      Foreground="#CBD5E1"
+                                                      BorderBrush="Transparent"
+                                                      BorderThickness="0"
+                                                      CornerRadius="10"
+                                                      Width="48"
+                                                      Height="64"
+                                                      IconSize="36"
+                                                      PointerOverBackground="#E61B2026"
+                                                      PointerOverForeground="#FFFFFF"
+                                                      PointerOverBorderBrush="Transparent"
+                                                      PressedBackground="#F01B2026"
+                                                      PressedForeground="#FFFFFF"
+                                                      PressedBorderBrush="Transparent"
+                                                      DisabledBackground="#CC111418"
+                                                      DisabledForeground="#80CBD5E1"
+                                                      DisabledBorderBrush="Transparent"
+                                                      DisabledOpacity="1" />
+        <atom.labs:ImageGalleryFilmstripAppearance x:Key="ShowcaseFilmstripAppearance"
+                                                         Background="#EEFFFFFF"
+                                                         BorderBrush="#280F172A"
+                                                         BorderThickness="1"
+                                                         CornerRadius="18"
+                                                         Padding="6" />
+        <atom.labs:ImageGalleryButtonAppearance x:Key="ShowcaseFilmstripNavigationAppearance"
+                                                      Background="Transparent"
+                                                      Foreground="#172033"
+                                                      BorderBrush="Transparent"
+                                                      BorderThickness="0"
+                                                      CornerRadius="14"
+                                                      Width="48"
+                                                      Height="48"
+                                                      IconSize="30"
+                                                      PointerOverBackground="Transparent"
+                                                      PointerOverForeground="#0F172A"
+                                                      PointerOverBorderBrush="Transparent"
+                                                      PressedBackground="#240F172A"
+                                                      PressedForeground="#0F172A"
+                                                      PressedBorderBrush="Transparent"
+                                                      DisabledBackground="Transparent"
+                                                      DisabledForeground="#660F172A"
+                                                      DisabledBorderBrush="Transparent"
+                                                      DisabledOpacity="0.55" />
+        <atom.labs:ImageGalleryButtonAppearance x:Key="ShowcaseAddImageButtonAppearance"
+                                                      Background="Transparent"
+                                                      Foreground="#1677FF"
+                                                      BorderBrush="Transparent"
+                                                      BorderThickness="0"
+                                                      CornerRadius="14"
+                                                      Width="48"
+                                                      Height="48"
+                                                      IconSize="30"
+                                                      PointerOverBackground="Transparent"
+                                                      PointerOverForeground="#0958D9"
+                                                      PressedBackground="#241677FF"
+                                                      PressedForeground="#003EB3"
+                                                      DisabledForeground="#661677FF"
+                                                      DisabledOpacity="0.55" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="labs|ImageGallery">
+            <Setter Property="ToolbarAppearance" Value="{StaticResource ShowcaseToolbarAppearance}" />
+            <Setter Property="ToolbarButtonAppearance" Value="{StaticResource ShowcaseToolbarButtonAppearance}" />
+            <Setter Property="ViewportNavigationButtonAppearance" Value="{StaticResource ShowcaseViewportNavigationAppearance}" />
+            <Setter Property="FilmstripAppearance" Value="{StaticResource ShowcaseFilmstripAppearance}" />
+            <Setter Property="FilmstripNavigationButtonAppearance" Value="{StaticResource ShowcaseFilmstripNavigationAppearance}" />
+            <Setter Property="AddImageButtonAppearance" Value="{StaticResource ShowcaseAddImageButtonAppearance}" />
+            <Setter Property="ThumbnailFilmstripExtent" Value="72" />
+            <Setter Property="ThumbnailItemExtent" Value="57.6" />
+            <Setter Property="ThumbnailItemSpacing" Value="0" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="{atom:SharedTokenResource ColorBgLayout}">
+        <gallery:GalleryStickyTabsHost x:Name="RootGalleryHost">
+            <gallery:GalleryStickyTabsHost.Header>
+                <gallery:GalleryShowCaseHeader Title="ImageGallery"
+                                               Category="Data Display"
+                                               Status="Experimental"
+                                               Subtitle="Virtualized image viewer with direct zoom, pan and rotation."
+                                               Description="Displays a selected image, a four-edge virtualized thumbnail filmstrip and a fixed operation toolbar without exposing the internal template."
+                                               Namespace="AtomUI.Labs.Controls.ImageGallery"
+                                               Package="AtomUI.Labs.Controls.ImageGallery"
+                                               BaseClass="SelectingItemsControl" />
+            </gallery:GalleryStickyTabsHost.Header>
+
+            <gallery:ShowCasePanel Name="ExamplesContent"
+                                   ContentMargin="28,10,28,28"
+                                   IsScrollEnabled="False"
+                                   IsDeferredLoadingEnabled="True"
+                                   InitialDeferredLoadItemCount="1"
+                                   DeferredLoadBatchSize="1"
+                                   MaxColumns="1">
+                <gallery:ShowCaseItem Title="Basic"
+                                      Description="The default entry point: select a thumbnail, use both navigation button groups, zoom at the pointer, pan a magnified image and rotate without mutating source metadata."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="560"
+                                                    ItemsSource="{CompiledBinding Images}"
+                                                    AddImageCommand="{CompiledBinding AddImageCommand}" />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Resource-only host"
+                                      Description="The gallery keeps selection, loading, title and filmstrip coordination while the blank viewport passes input and rendering responsibility to an underlying consumer canvas. MainImageDecodeSizeHint requests consumer-appropriate clarity; TryAcquireCurrentImage returns the caller-owned lease."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <Grid Height="500">
+                                <Border Margin="18,72,18,96"
+                                        Background="#162338"
+                                        CornerRadius="18">
+                                    <StackPanel HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Spacing="8">
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   FontSize="22"
+                                                   Foreground="#E6F0FF"
+                                                   Text="Consumer-owned render surface" />
+                                        <TextBlock HorizontalAlignment="Center"
+                                                   Foreground="#9CB4D0"
+                                                   Text="The ResourceOnly viewport is transparent and hit-through here." />
+                                    </StackPanel>
+                                </Border>
+                                <atom.labs:ImageGallery MainImageMode="ResourceOnly"
+                                                        MainImageDecodeSizeHint="1600,900"
+                                                        ItemsSource="{CompiledBinding Images}"
+                                                        IsViewportNavigationEnabled="False"
+                                                        IsAddImageButtonVisible="False">
+                                    <atom.labs:ImageGallery.ToolbarContent>
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Text="Lease available through TryAcquireCurrentImage" />
+                                    </atom.labs:ImageGallery.ToolbarContent>
+                                </atom.labs:ImageGallery>
+                            </Grid>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Four-edge placement"
+                                      Description="Filmstrip orientation follows Top, Bottom, Left or Right placement; a toolbar configured on the same edge is automatically moved to the opposite edge."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <Grid RowDefinitions="320,320" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                                <atom.labs:ImageGallery ItemsSource="{CompiledBinding Images}"
+                                                        ThumbnailFilmstripPlacement="Top"
+                                                        ToolbarPlacement="Top"
+                                                        IsAddImageButtonVisible="False" />
+                                <atom.labs:ImageGallery Grid.Column="1"
+                                                        ItemsSource="{CompiledBinding Images}"
+                                                        ThumbnailFilmstripPlacement="Bottom"
+                                                        ToolbarPlacement="Bottom"
+                                                        IsAddImageButtonVisible="False" />
+                                <atom.labs:ImageGallery Grid.Row="1"
+                                                        ItemsSource="{CompiledBinding Images}"
+                                                        ThumbnailFilmstripPlacement="Left"
+                                                        ToolbarPlacement="Left"
+                                                        IsAddImageButtonVisible="False" />
+                                <atom.labs:ImageGallery Grid.Row="1" Grid.Column="1"
+                                                        ItemsSource="{CompiledBinding Images}"
+                                                        ThumbnailFilmstripPlacement="Right"
+                                                        ToolbarPlacement="Right"
+                                                        IsAddImageButtonVisible="False" />
+                            </Grid>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Interaction surface"
+                                      Description="Viewport navigation can be hidden independently while filmstrip navigation remains available; custom toolbar content is always appended at the end."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="500"
+                                                    ItemsSource="{CompiledBinding Images}"
+                                                    IsViewportNavigationEnabled="False"
+                                                    WheelZoomMode="ControlModifier"
+                                                    ToolbarPlacement="Bottom"
+                                                    ThumbnailFilmstripPlacement="Top">
+                                <atom.labs:ImageGallery.ToolbarContent>
+                                    <TextBlock Text="Custom action region" VerticalAlignment="Center" />
+                                </atom.labs:ImageGallery.ToolbarContent>
+                            </atom.labs:ImageGallery>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Property-level appearance"
+                                      Description="Appearance objects customize stable subcomponents at runtime without replacing the root ControlTheme or template structure."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="500"
+                                                    ItemsSource="{CompiledBinding Images}"
+                                                    IsAddImageButtonVisible="False">
+                                <atom.labs:ImageGallery.ViewportAppearance>
+                                    <atom.labs:ImageGalleryViewportAppearance Background="#101726"
+                                                                                     CornerRadius="16" />
+                                </atom.labs:ImageGallery.ViewportAppearance>
+                                <atom.labs:ImageGallery.ToolbarAppearance>
+                                    <atom.labs:ImageGalleryToolbarAppearance Background="#E6202A3A"
+                                                                                    Foreground="White"
+                                                                                    BorderBrush="Transparent"
+                                                                                    BorderThickness="0"
+                                                                                    CornerRadius="12"
+                                                                                    Padding="14,8" />
+                                </atom.labs:ImageGallery.ToolbarAppearance>
+                                <atom.labs:ImageGallery.ThumbnailItemAppearance>
+                                    <atom.labs:ImageGalleryThumbnailItemAppearance SelectionIndicatorBrush="#7DD3FC"
+                                                                                          SelectionIndicatorThickness="3"
+                                                                                          Opacity="0.94" />
+                                </atom.labs:ImageGallery.ThumbnailItemAppearance>
+                            </atom.labs:ImageGallery>
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Failure state"
+                                      Description="A damaged source deterministically enters Error; navigation to the next item proves the failure is isolated to one descriptor and does not poison selection."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="420"
+                                                    ItemsSource="{CompiledBinding ErrorImages}"
+                                                    IsAddImageButtonVisible="False" />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="Large collection"
+                                      Description="Ten thousand descriptors exercise real thumbnail virtualization. Container count stays bounded by viewport plus overscan instead of total item count."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="500"
+                                                    ItemsSource="{CompiledBinding LargeImages}"
+                                                    IsAddImageButtonVisible="False" />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+
+                <gallery:ShowCaseItem Title="NativeAOT contract"
+                                      Description="The same strongly typed ItemsSource, generated localization resources, fixed compiled AXAML and explicit source abstractions are used by the win-x64 NativeAOT smoke host."
+                                      IsDeferredContentEnabled="True">
+                    <gallery:ShowCaseItem.DeferredContentTemplate>
+                        <DataTemplate x:DataType="imageGallery:ImageGalleryViewModel">
+                            <atom.labs:ImageGallery Height="420"
+                                                    ItemsSource="{CompiledBinding Images}"
+                                                    IsToolbarTitleVisible="False"
+                                                    IsToolbarRotationVisible="False"
+                                                    IsAddImageButtonVisible="False" />
+                        </DataTemplate>
+                    </gallery:ShowCaseItem.DeferredContentTemplate>
+                </gallery:ShowCaseItem>
+            </gallery:ShowCasePanel>
+        </gallery:GalleryStickyTabsHost>
+    </Grid>
+</UserControl>
