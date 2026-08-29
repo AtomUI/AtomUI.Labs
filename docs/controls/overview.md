@@ -7,3 +7,4 @@
 ## 控件目录
 
 - [LED 控件家族](led/overview.md)：已实现的 `AtomUI.Labs.Controls.Led` 包，包含十四段 Segment、5x7 Matrix、Glow 和 Marquee。
+- [ImageGallery](image-gallery/overview.md)：已完成首版源码施工的沉浸式图片集合查看控件，并已加入 `ResourceOnly`、当前主图安全 Lease 获取和解码尺寸提示；施工与复审从 [首版施工合同](image-gallery/implementation-contract.md) 进入，专项虚拟化与发布证据继续由该目录内验证文档约束。最终 RC 仍以完整 Gallery 人眼、真实图片/DPI/触控和发布闸门证据为准。
