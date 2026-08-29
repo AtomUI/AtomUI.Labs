@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:atom.labs="https://atomui.net/labs"
+             xmlns:aot="using:AtomUILabsGallery.ShowCases.ImageGallery.Aot"
+             x:Class="AtomUILabsGallery.ShowCases.ImageGallery.Aot.ImageGalleryAotSmokeView"
+             x:DataType="aot:ImageGalleryAotSmokeViewModel">
+    <atom.labs:ImageGallery x:Name="Gallery"
+                            Width="800"
+                            Height="520"
+                            ItemsSource="{CompiledBinding Items}"
+                            IsAddImageButtonVisible="False" />
+</UserControl>
